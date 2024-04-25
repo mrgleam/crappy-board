@@ -1,4 +1,5 @@
 name = "crappy_board"
+target = "javascript"
 version = "1.0.0"
 
 # Fill out these fields if you intend to generate HTML documentation or publish
@@ -18,3 +19,4 @@ lustre = ">= 4.1.8 and < 5.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
+lustre_dev_tools = ">= 1.2.2 and < 2.0.0"
