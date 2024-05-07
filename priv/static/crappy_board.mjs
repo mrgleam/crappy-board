@@ -836,7 +836,7 @@ function main() {
     throw makeError(
       "assignment_no_match",
       "crappy_board",
-      43,
+      47,
       "main",
       "Assignment pattern did not match",
       { value: $ }
