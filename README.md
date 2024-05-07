@@ -23,3 +23,8 @@ gleam run   # Run the project
 gleam test  # Run the tests
 gleam shell # Run an Erlang shell
 ```
+
+## Thanks
+
+Special thanks to [Chris Heilmann](https://webdesign.tutsplus.com/create-a-sticky-note-effect-in-5-easy-steps-with-css3-and-html5--net-13934t) for the
+Sticky Note Effect in 5 Easy Steps With CSS3 and HTML5.
