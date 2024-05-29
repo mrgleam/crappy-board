@@ -1,50 +1,31 @@
-import lustre
-import lustre/attribute
-import lustre/element
-import lustre/element/html
-
-// import card.{init, update, view}
+import app/router
+import app/web.{Context}
+import dot_env
+import dot_env/env
+import gleam/erlang/process
+import mist
+import wisp
 
 pub fn main() {
-  let app =
-    lustre.element(
-      html.div([], [
-        html.ul([], [
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #1")]),
-              html.p([], [element.text("Text Content #1")]),
-            ]),
-          ]),
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #2")]),
-              html.p([], [element.text("Text Content #2")]),
-            ]),
-          ]),
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #3")]),
-              html.p([], [element.text("Text Content #3")]),
-            ]),
-          ]),
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #4")]),
-              html.p([], [element.text("Text Content #4")]),
-            ]),
-          ]),
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #5")]),
-              html.p([], [element.text("Text Content #5")]),
-            ]),
-          ]),
-        ]),
-      ]),
-    )
-  // let app2 = lustre.simple(init, update, view)
-  let assert Ok(_) = lustre.start(app, "#app", Nil)
+  wisp.configure_logger()
 
-  Nil
+  dot_env.load()
+  let assert Ok(secret_key_base) = env.get("SECRET_KEY_BASE")
+
+  let ctx = Context(static_directory: static_directory(), items: [])
+
+  let handler = router.handle_request(_, ctx)
+
+  let assert Ok(_) =
+    wisp.mist_handler(handler, secret_key_base)
+    |> mist.new
+    |> mist.port(8000)
+    |> mist.start_http
+
+  process.sleep_forever()
+}
+
+fn static_directory() {
+  let assert Ok(priv_directory) = wisp.priv_directory("crappy_board")
+  priv_directory <> "/static"
 }
