@@ -726,8 +726,21 @@ select {
   flex: 1 1 0%;
 }
 
+.flex-col {
+  flex-direction: column;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
 .rounded-md {
   border-radius: 0.375rem;
+}
+
+.bg-blue-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(59 130 246 / var(--tw-bg-opacity));
 }
 
 .bg-cyan-700 {
@@ -745,6 +758,11 @@ select {
   background-color: rgb(194 65 12 / var(--tw-bg-opacity));
 }
 
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
 .text-center {
   text-align: center;
 }
@@ -752,6 +770,15 @@ select {
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-white {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
 body {
@@ -774,11 +801,13 @@ h2 {
 p {
   font-family: 'Reenie Beanie';
   font-size: 1.5rem;
-  textarea {
-    width: 100%;
-    background: transparent;
-    overflow: hidden;
-  }
+}
+
+.todo_input {
+  width: 100%;
+  background: transparent;
+  overflow: hidden;
+  resize: none;
 }
 
 .word-counter {
@@ -859,4 +888,9 @@ ul li:nth-child(5n) a{
   transform:rotate(5deg);
   position:relative;
   top:-10px;
+}
+
+.hover\:bg-blue-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(29 78 216 / var(--tw-bg-opacity));
 }

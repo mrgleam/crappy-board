@@ -19,12 +19,12 @@ h2 {
 p {
   font-family: 'Reenie Beanie';
   font-size: 1.5rem;
-
-  textarea {
-    width: 100%;
-    background: transparent;
-    overflow: hidden;
-  }
+}
+.todo_input {
+  width: 100%;
+  background: transparent;
+  overflow: hidden;
+  resize: none;
 }
 .word-counter {
   text-align: right;
