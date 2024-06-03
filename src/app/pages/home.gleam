@@ -1,4 +1,4 @@
-import lustre/attribute.{class, rows, attribute, name, placeholder, autofocus}
+import lustre/attribute.{attribute, autofocus, class, name, placeholder, rows}
 import lustre/element.{type Element}
 import lustre/element/html.{form, textarea}
 
@@ -133,19 +133,26 @@ fn todo_input() -> Element(t) {
     html.a([attribute.href("#")], [
       form([attribute.method("POST"), attribute.action("/items/create")], [
         html.div([class("flex flex-col")], [
-        textarea(
-          [
-            class("todo_input"),
-            rows(4),
-            attribute("maxlength", "50"),
-            name("todo_input"),
-            placeholder("What needs to be done?"),
-            autofocus(True),
-          ],
-          "",
-        ),
-        html.button([class("bg-blue-500 hover:bg-blue-700 text-white font-bold px-4 rounded")], [element.text("OK")]),
-        ])
+          textarea(
+            [
+              class("todo_input"),
+              rows(4),
+              attribute("maxlength", "50"),
+              name("todo_input"),
+              placeholder("What needs to be done?"),
+              autofocus(True),
+            ],
+            "",
+          ),
+          html.button(
+            [
+              class(
+                "bg-blue-500 hover:bg-blue-700 text-white font-bold px-4 rounded",
+              ),
+            ],
+            [element.text("OK")],
+          ),
+        ]),
       ]),
     ]),
   ])
