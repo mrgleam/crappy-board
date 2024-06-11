@@ -1,5 +1,12 @@
+import app/error.{type AppError}
+import gleam/dynamic
+import gleam/io
 import gleam/option.{type Option}
-import wisp
+import gleam/pgo.{type Connection}
+import gleam/result
+
+pub type State =
+  Option(Item)
 
 pub type ItemStatus {
   Todo
@@ -8,22 +15,90 @@ pub type ItemStatus {
 }
 
 pub type Item {
-  Item(id: String, content: String, status: ItemStatus)
+  Item(id: BitArray, content: String, status: String)
 }
 
-pub fn create_item(id: Option(String), content: String) -> Item {
-  let id = option.unwrap(id, wisp.random_string(64))
-  Item(id, content, Todo)
+/// Decode an item from a database row.
+///
+pub fn item_row_decoder() -> dynamic.Decoder(Item) {
+  dynamic.decode3(
+    Item,
+    dynamic.element(0, dynamic.bit_array),
+    dynamic.element(1, dynamic.string),
+    dynamic.element(2, dynamic.string),
+  )
 }
 
-pub fn toggle_item(item: Item, new_status: ItemStatus) -> Item {
-  Item(..item, status: new_status)
+/// Insert a new item for a given user.
+///
+pub fn create_item(
+  content: String,
+  db: Connection,
+) -> Result(BitArray, AppError) {
+  let sql =
+    "
+      INSERT INTO tasks
+        (content, status) 
+      VALUES 
+        ($1, 'TODO')
+      RETURNING
+        id
+    "
+  use returned <- result.then(
+    pgo.execute(
+      sql,
+      db,
+      [pgo.text(content)],
+      dynamic.element(0, dynamic.bit_array),
+    )
+    |> result.map_error(fn(error) {
+      io.debug(error)
+      case error {
+        pgo.ConstraintViolated(_, _, _) -> error.ContentRequired
+        _ -> error.BadRequest
+      }
+    }),
+  )
+
+  let assert [id] = returned.rows
+  Ok(id)
+}
+
+pub fn list_items(db: Connection) -> List(Item) {
+  let sql =
+    "
+      SELECT
+        id,
+        content,
+        status
+      FROM
+        tasks
+      ORDER BY
+        created_at asc
+    "
+
+  let assert Ok(returned) = pgo.execute(sql, db, [], item_row_decoder())
+
+  returned.rows
+}
+
+pub fn toggle_item(new_status: ItemStatus, item: Item) -> Item {
+  Item(..item, status: item_status_to_string(new_status))
 }
 
 pub fn item_status_to_string(status: ItemStatus) -> String {
   case status {
-    Todo -> "Todo"
-    Doing -> "Doing"
-    Done -> "Done"
+    Todo -> "TODO"
+    Doing -> "DOING"
+    Done -> "DONE"
+  }
+}
+
+pub fn string_to_item_status(status: String) -> ItemStatus {
+  case status {
+    "TODO" -> Todo
+    "DOING" -> Doing
+    "DONE" -> Done
+    _ -> Todo
   }
 }

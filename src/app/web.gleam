@@ -1,9 +1,10 @@
 import gleam/bool
+import gleam/pgo.{type Connection}
 import gleam/string_builder
 import wisp
 
 pub type Context {
-  Context(static_directory: String, items: List(String))
+  Context(static_directory: String, db: Connection)
 }
 
 pub fn middleware(
