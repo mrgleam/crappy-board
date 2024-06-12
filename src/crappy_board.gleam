@@ -3,11 +3,11 @@ import app/web.{Context}
 import dot_env
 import dot_env/env
 import gleam/erlang/process
+import gleam/int
 import gleam/option.{Some}
 import gleam/pgo
 import mist
 import wisp
-import gleam/int
 
 pub fn main() {
   wisp.configure_logger()

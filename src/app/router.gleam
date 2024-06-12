@@ -8,13 +8,17 @@ import lustre/element
 import wisp.{type Request, type Response}
 
 pub fn handle_request(req: Request, ctx: Context) -> Response {
-  use _req <- web.middleware(req, ctx)
+  use req <- web.middleware(req, ctx)
 
   case wisp.path_segments(req) {
     [] -> home(ctx)
     ["items", "create"] -> {
       use <- wisp.require_method(req, http.Post)
       item_routes.post_create_item(req, ctx)
+    }
+    ["items", id] -> {
+      use <- wisp.require_method(req, http.Delete)
+      item_routes.post_delete_item(ctx, id)
     }
     // All the empty responses
     ["internal-server-error"] -> wisp.internal_server_error()

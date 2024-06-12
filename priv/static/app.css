@@ -726,12 +726,28 @@ select {
   display: flex;
 }
 
+.h-\[18px\] {
+  height: 18px;
+}
+
+.w-\[18px\] {
+  width: 18px;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
 
+.flex-row {
+  flex-direction: row;
+}
+
 .flex-col {
   flex-direction: column;
+}
+
+.justify-between {
+  justify-content: space-between;
 }
 
 .rounded {
@@ -780,6 +796,11 @@ select {
   font-weight: 700;
 }
 
+.text-gray-800 {
+  --tw-text-opacity: 1;
+  color: rgb(31 41 55 / var(--tw-text-opacity));
+}
+
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
@@ -805,6 +826,7 @@ h2 {
 p {
   font-family: 'Reenie Beanie';
   font-size: 1.5rem;
+  word-break: break-word;
 }
 
 .todo_input {
@@ -829,14 +851,21 @@ ul{
   justify-content: center;
 }
 
+.navigate {
+  display: none;
+}
+
 ul li a:hover,ul li a:focus{
   box-shadow: 10px 10px 7px rgba(0,0,0,.7);
   transform: scale(1.25);
   position: relative;
   z-index: 5;
+  .navigate {
+    display: flex;
+  }
 }
 
-ul li a{
+ul li a {
   transform:rotate(-6deg);
   text-decoration:none;
   color:#000;
@@ -844,9 +873,10 @@ ul li a{
   display:block;
   height:10em;
   width:10em;
-  padding:1em;
+  padding:0.5em;
   box-shadow: 5px 5px 7px rgba(33,33,33,.7);
   transition: transform .15s linear;
+  overflow-y: scroll;
 }
 
 ul li{
@@ -892,4 +922,11 @@ ul li:nth-child(5n) a{
   transform:rotate(5deg);
   position:relative;
   top:-10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dark\:text-black {
+    --tw-text-opacity: 1;
+    color: rgb(0 0 0 / var(--tw-text-opacity));
+  }
 }

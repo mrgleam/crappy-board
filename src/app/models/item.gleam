@@ -82,6 +82,26 @@ pub fn list_items(db: Connection) -> List(Item) {
   returned.rows
 }
 
+pub fn delete_item(item_id: String, db: Connection) -> Result(Int, AppError) {
+  let sql =
+    "
+      DELETE FROM tasks WHERE id = $1
+    "
+  use returned <- result.then(
+    pgo.execute(sql, db, [pgo.text(item_id)], dynamic.int)
+    |> result.map_error(fn(error) {
+      io.debug(error)
+      case error {
+        pgo.ConstraintViolated(_, _, _) -> error.ContentRequired
+        _ -> error.BadRequest
+      }
+    }),
+  )
+
+  let count = returned.count
+  Ok(count)
+}
+
 pub fn toggle_item(new_status: ItemStatus, item: Item) -> Item {
   Item(..item, status: item_status_to_string(new_status))
 }

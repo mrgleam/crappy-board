@@ -1,8 +1,11 @@
+import app/helpers/uuid
 import app/models/item.{type Item}
 import gleam/list
+import gleam/result
 import lustre/attribute.{attribute, autofocus, class, name, placeholder, rows}
 import lustre/element.{type Element}
-import lustre/element/html.{form, textarea}
+import lustre/element/html.{button, form, svg, textarea}
+import lustre/element/svg
 
 pub fn root(items: List(Item)) -> Element(t) {
   html.div([attribute.class("flex")], [
@@ -109,7 +112,44 @@ fn todos(items: List(Item)) -> Element(t) {
 
 fn item(item: Item) -> Element(t) {
   html.li([], [
-    html.a([attribute.href("#")], [html.p([], [element.text(item.content)])]),
+    html.a([attribute.href("#")], [
+      html.div([class("flex flex-row justify-between navigate")], [
+        form(
+          [
+            attribute.method("POST"),
+            attribute.action(
+              "/items/"
+              <> result.unwrap(uuid.cast(item.id), "")
+              <> "/todo?_method=PATCH",
+            ),
+          ],
+          [button([], [svg_icon_angle_left()])],
+        ),
+        form(
+          [
+            attribute.method("POST"),
+            attribute.action(
+              "/items/"
+              <> result.unwrap(uuid.cast(item.id), "")
+              <> "?_method=DELETE",
+            ),
+          ],
+          [button([], [svg_icon_delete()])],
+        ),
+        form(
+          [
+            attribute.method("POST"),
+            attribute.action(
+              "/items/"
+              <> result.unwrap(uuid.cast(item.id), "")
+              <> "/doing?_method=PATCH",
+            ),
+          ],
+          [button([], [svg_icon_angle_right()])],
+        ),
+      ]),
+      html.p([], [element.text(item.content)]),
+    ]),
   ])
 }
 
@@ -122,7 +162,7 @@ fn todo_input() -> Element(t) {
             [
               class("todo_input"),
               rows(4),
-              attribute("maxlength", "50"),
+              attribute("maxlength", "32"),
               name("todo_input"),
               placeholder("What needs to be done?"),
               autofocus(True),
@@ -136,4 +176,62 @@ fn todo_input() -> Element(t) {
       ]),
     ]),
   ])
+}
+
+fn svg_icon_angle_left() -> Element(t) {
+  svg(
+    [
+      class("w-[18px] h-[18px] text-gray-800 dark:text-black"),
+      attribute.attribute("aria-hidden", "true"),
+      attribute.attribute("fill", "none"),
+      attribute.attribute("viewBox", "0 0 24 24"),
+    ],
+    [
+      svg.path([
+        attribute.attribute("stroke", "currentColor"),
+        attribute.attribute("stroke-linecap", "round"),
+        attribute.attribute("stroke-linejoin", "round"),
+        attribute.attribute("stroke-width", "2"),
+        attribute.attribute("d", "m15 19-7-7 7-7"),
+      ]),
+    ],
+  )
+}
+
+fn svg_icon_angle_right() -> Element(t) {
+  svg(
+    [
+      class("w-[18px] h-[18px] text-gray-800 dark:text-black"),
+      attribute.attribute("aria-hidden", "true"),
+      attribute.attribute("fill", "none"),
+      attribute.attribute("viewBox", "0 0 24 24"),
+    ],
+    [
+      svg.path([
+        attribute.attribute("stroke", "currentColor"),
+        attribute.attribute("stroke-linecap", "round"),
+        attribute.attribute("stroke-linejoin", "round"),
+        attribute.attribute("stroke-width", "2"),
+        attribute.attribute("d", "m9 5 7 7-7 7"),
+      ]),
+    ],
+  )
+}
+
+fn svg_icon_delete() -> Element(t) {
+  svg(
+    [
+      class("w-[18px] h-[18px] text-gray-800 dark:text-black"),
+      attribute.attribute("viewBox", "0 0 24 24"),
+    ],
+    [
+      svg.path([
+        attribute.attribute("fill", "currentColor"),
+        attribute.attribute(
+          "d",
+          "M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M9,8H11V17H9V8M13,8H15V17H13V8Z",
+        ),
+      ]),
+    ],
+  )
 }

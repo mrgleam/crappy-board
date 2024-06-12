@@ -1,13 +1,9 @@
 import app/error
-import app/models/item.{type Item, create_item}
+import app/models/item.{create_item, delete_item}
 import app/web.{type Context, Context}
-import gleam/dynamic
-import gleam/json
 import gleam/list
-import gleam/option.{None, Some}
 import gleam/result
-import gleam/string
-import wisp.{type Request, type Response}
+import wisp.{type Request}
 
 pub fn post_create_item(req: Request, ctx: Context) {
   use form <- wisp.require_form(req)
@@ -30,6 +26,18 @@ pub fn post_create_item(req: Request, ctx: Context) {
   }
 }
 
+pub fn post_delete_item(ctx: Context, item_id: String) {
+  let result = delete_item(item_id, ctx.db)
+
+  case result {
+    Ok(_) -> {
+      wisp.redirect("/")
+    }
+    Error(_) -> {
+      wisp.bad_request()
+    }
+  }
+}
 // fn todos_to_json(items: List(Item)) -> String {
 //   "["
 //   <> items
