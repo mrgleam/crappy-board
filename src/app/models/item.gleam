@@ -102,8 +102,29 @@ pub fn delete_item(item_id: String, db: Connection) -> Result(Int, AppError) {
   Ok(count)
 }
 
-pub fn toggle_item(new_status: ItemStatus, item: Item) -> Item {
-  Item(..item, status: item_status_to_string(new_status))
+pub fn patch_item(item_id: String, status: ItemStatus, db: Connection) {
+  let sql =
+    "
+      UPDATE tasks SET status = $1 WHERE id = $2
+    "
+  use returned <- result.then(
+    pgo.execute(
+      sql,
+      db,
+      [pgo.text(item_status_to_string(status)), pgo.text(item_id)],
+      dynamic.int,
+    )
+    |> result.map_error(fn(error) {
+      io.debug(error)
+      case error {
+        pgo.ConstraintViolated(_, _, _) -> error.ContentRequired
+        _ -> error.BadRequest
+      }
+    }),
+  )
+
+  let count = returned.count
+  Ok(count)
 }
 
 pub fn item_status_to_string(status: ItemStatus) -> String {
@@ -120,5 +141,21 @@ pub fn string_to_item_status(status: String) -> ItemStatus {
     "DOING" -> Doing
     "DONE" -> Done
     _ -> Todo
+  }
+}
+
+pub fn prev_status(status: ItemStatus) -> ItemStatus {
+  case status {
+    Todo -> Todo
+    Doing -> Todo
+    Done -> Doing
+  }
+}
+
+pub fn next_status(status: ItemStatus) -> ItemStatus {
+  case status {
+    Todo -> Doing
+    Doing -> Done
+    Done -> Done
   }
 }

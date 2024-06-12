@@ -1,5 +1,5 @@
 import app/error
-import app/models/item.{create_item, delete_item}
+import app/models/item.{create_item, delete_item, patch_item}
 import app/web.{type Context, Context}
 import gleam/list
 import gleam/result
@@ -29,6 +29,42 @@ pub fn post_create_item(req: Request, ctx: Context) {
 pub fn post_delete_item(ctx: Context, item_id: String) {
   let result = delete_item(item_id, ctx.db)
 
+  case result {
+    Ok(_) -> {
+      wisp.redirect("/")
+    }
+    Error(_) -> {
+      wisp.bad_request()
+    }
+  }
+}
+
+pub fn patch_todo(ctx: Context, item_id: String) {
+  let result = patch_item(item_id, item.Todo, ctx.db)
+  case result {
+    Ok(_) -> {
+      wisp.redirect("/")
+    }
+    Error(_) -> {
+      wisp.bad_request()
+    }
+  }
+}
+
+pub fn patch_doing(ctx: Context, item_id: String) {
+  let result = patch_item(item_id, item.Doing, ctx.db)
+  case result {
+    Ok(_) -> {
+      wisp.redirect("/")
+    }
+    Error(_) -> {
+      wisp.bad_request()
+    }
+  }
+}
+
+pub fn patch_done(ctx: Context, item_id: String) {
+  let result = patch_item(item_id, item.Done, ctx.db)
   case result {
     Ok(_) -> {
       wisp.redirect("/")

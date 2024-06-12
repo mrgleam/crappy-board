@@ -1,7 +1,11 @@
 import app/helpers/uuid
-import app/models/item.{type Item}
+import app/models/item.{
+  type Item, item_status_to_string, next_status, prev_status,
+  string_to_item_status,
+}
 import gleam/list
 import gleam/result
+import gleam/string.{lowercase}
 import lustre/attribute.{attribute, autofocus, class, name, placeholder, rows}
 import lustre/element.{type Element}
 import lustre/element/html.{button, form, svg, textarea}
@@ -14,87 +18,33 @@ pub fn root(items: List(Item)) -> Element(t) {
         [attribute.class("text-2xl text-center bg-orange-700 rounded-md m-1.5")],
         [element.text("To Do")],
       ),
-      todos(items),
+      todos(
+        list.filter(items, fn(item) {
+          item.status |> string_to_item_status == item.Todo
+        }),
+      ),
     ]),
     html.div([attribute.class("flex-1")], [
       html.div(
         [attribute.class("text-2xl text-center bg-cyan-700 rounded-md m-1.5")],
         [element.text("Doing")],
       ),
-      html.div([], [
-        html.ul([], [
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #1")]),
-              html.p([], [element.text("Text Content #1")]),
-            ]),
-          ]),
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #2")]),
-              html.p([], [element.text("Text Content #2")]),
-            ]),
-          ]),
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #3")]),
-              html.p([], [element.text("Text Content #3")]),
-            ]),
-          ]),
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #4")]),
-              html.p([], [element.text("Text Content #4")]),
-            ]),
-          ]),
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #5")]),
-              html.p([], [element.text("Text Content #5")]),
-            ]),
-          ]),
-        ]),
-      ]),
+      others(
+        list.filter(items, fn(item) {
+          item.status |> string_to_item_status == item.Doing
+        }),
+      ),
     ]),
     html.div([attribute.class("flex-1")], [
       html.div(
         [attribute.class("text-2xl text-center bg-green-700 rounded-md m-1.5")],
         [element.text("Done")],
       ),
-      html.div([], [
-        html.ul([], [
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #1")]),
-              html.p([], [element.text("Text Content #1")]),
-            ]),
-          ]),
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #2")]),
-              html.p([], [element.text("Text Content #2")]),
-            ]),
-          ]),
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #3")]),
-              html.p([], [element.text("Text Content #3")]),
-            ]),
-          ]),
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #4")]),
-              html.p([], [element.text("Text Content #4")]),
-            ]),
-          ]),
-          html.li([], [
-            html.a([attribute.href("#")], [
-              html.h2([], [element.text("Title #5")]),
-              html.p([], [element.text("Text Content #5")]),
-            ]),
-          ]),
-        ]),
-      ]),
+      others(
+        list.filter(items, fn(item) {
+          item.status |> string_to_item_status == item.Done
+        }),
+      ),
     ]),
   ])
 }
@@ -105,26 +55,66 @@ fn todos(items: List(Item)) -> Element(t) {
       [],
       items
         |> list.map(item)
-        |> list.append([todo_input()]),
+        |> list.prepend(todo_input()),
     ),
   ])
+}
+
+fn others(items: List(Item)) -> Element(t) {
+  html.div([], [
+    html.ul(
+      [],
+      items
+        |> list.map(item),
+    ),
+  ])
+}
+
+fn toggle_prev(item: Item) -> Element(t) {
+  form(
+    [
+      attribute.method("POST"),
+      attribute.action(
+        "/items/"
+        <> result.unwrap(uuid.cast(item.id), "")
+        <> "/"
+        <> item.status
+        |> string_to_item_status
+        |> prev_status
+        |> item_status_to_string
+        |> lowercase
+        <> "?_method=PATCH",
+      ),
+    ],
+    [button([], [svg_icon_angle_left()])],
+  )
+}
+
+fn toggle_next(item: Item) -> Element(t) {
+  form(
+    [
+      attribute.method("POST"),
+      attribute.action(
+        "/items/"
+        <> result.unwrap(uuid.cast(item.id), "")
+        <> "/"
+        <> item.status
+        |> string_to_item_status
+        |> next_status
+        |> item_status_to_string
+        |> lowercase
+        <> "?_method=PATCH",
+      ),
+    ],
+    [button([], [svg_icon_angle_right()])],
+  )
 }
 
 fn item(item: Item) -> Element(t) {
   html.li([], [
     html.a([attribute.href("#")], [
       html.div([class("flex flex-row justify-between navigate")], [
-        form(
-          [
-            attribute.method("POST"),
-            attribute.action(
-              "/items/"
-              <> result.unwrap(uuid.cast(item.id), "")
-              <> "/todo?_method=PATCH",
-            ),
-          ],
-          [button([], [svg_icon_angle_left()])],
-        ),
+        toggle_prev(item),
         form(
           [
             attribute.method("POST"),
@@ -136,17 +126,7 @@ fn item(item: Item) -> Element(t) {
           ],
           [button([], [svg_icon_delete()])],
         ),
-        form(
-          [
-            attribute.method("POST"),
-            attribute.action(
-              "/items/"
-              <> result.unwrap(uuid.cast(item.id), "")
-              <> "/doing?_method=PATCH",
-            ),
-          ],
-          [button([], [svg_icon_angle_right()])],
-        ),
+        toggle_next(item),
       ]),
       html.p([], [element.text(item.content)]),
     ]),
