@@ -31,12 +31,13 @@ jobs:
           - 5432:5432
     steps:
     - uses: actions/checkout@v4
-    - name: "Start Backend"
+    - name: Set up Gleam, Beam
       uses: erlef/setup-beam@v1
       with:
         otp-version: "26.0.2"
         gleam-version: "1.2.0"
         rebar3-version: "3"
+    - name: "Start Backend"
       env:
         SECRET_KEY_BASE: test-secret-key
         PG_USER: postgres
