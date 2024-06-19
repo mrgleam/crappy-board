@@ -24,11 +24,12 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-          -v /__w/.github/workflows/db/postgres:/docker-entrypoint-initdb.d
         ports:
           - 5432:5432
     steps:
     - uses: actions/checkout@v4
+    - name: Run migrations
+      run: psql -f migrations/init.sql postgresql://postgres:postgres@localhost:5432/crappy_test
     - name: Set up Gleam, Beam
       uses: erlef/setup-beam@v1
       with:
