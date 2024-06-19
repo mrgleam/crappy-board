@@ -11,8 +11,43 @@ jobs:
   e2e_test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: crappy_test
+
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          -v /__w/.github/workflows/db/postgres:/docker-entrypoint-initdb.d
+        ports:
+          - 5432:5432
     steps:
     - uses: actions/checkout@v4
+    - name: "Start Backend"
+    - uses: erlef/setup-beam@v1
+      with:
+        otp-version: "26.0.2"
+        gleam-version: "1.2.0"
+        rebar3-version: "3"
+      env:
+        SECRET_KEY_BASE: test-secret-key
+        PG_USER: postgres
+        PG_PASSWORD: postgres
+        PG_HOST: localhost
+        PG_PORT: 5432
+        PG_DB: crappy_test
+      run: |
+        cd .. && gleam run &
+        sleep 5 &&
+        curl http://localhost:8000 -I
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*

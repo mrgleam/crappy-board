@@ -17,6 +17,7 @@ pub fn main() {
   let assert Ok(pg_host) = env.get("PG_HOST")
   let assert Ok(pg_port_string) = env.get("PG_PORT")
   let assert Ok(pa_port) = int.parse(pg_port_string)
+  let assert Ok(pg_db) = env.get("PG_DB")
   let assert Ok(pg_user) = env.get("PG_USER")
   let assert Ok(pg_password) = env.get("PG_PASSWORD")
 
@@ -28,7 +29,7 @@ pub fn main() {
         ..pgo.default_config(),
         host: pg_host,
         port: pa_port,
-        database: "crappy",
+        database: pg_db,
         user: pg_user,
         password: Some(pg_password),
         pool_size: 15,
