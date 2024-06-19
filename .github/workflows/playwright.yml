@@ -47,7 +47,7 @@ jobs:
         PG_DB: crappy_test
       run: |
         cd .. && gleam run &
-        sleep 10 &&
+        sleep 30 &&
         curl http://localhost:8000 -I
     - uses: actions/setup-node@v4
       with:
