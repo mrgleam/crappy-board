@@ -59,7 +59,7 @@ jobs:
       run: yarn playwright install --with-deps
     - name: Run Playwright tests
       working-directory: e2e
-      run: yarn playwright test
+      run: yarn start:ci
     - uses: actions/upload-artifact@v4
       if: always()
       with:

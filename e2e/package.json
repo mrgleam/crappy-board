@@ -7,5 +7,8 @@
     "@playwright/test": "^1.44.1",
     "@types/node": "^20.14.5"
   },
-  "scripts": {}
+  "scripts": {
+    "start": "URL=http://localhost:8000 playwright test --ui",
+    "start:ci": "URL=http://localhost:8000 playwright test"
+  }
 }

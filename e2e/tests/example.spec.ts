@@ -1,5 +1,11 @@
 import { test, expect } from '@playwright/test';
 
+test('has todo input with placeholder `What needs to be done?`', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.getByPlaceholder('What needs to be done?')).toBeVisible();
+});
+
 test('has title', async ({ page }) => {
   await page.goto('https://playwright.dev/');
 
