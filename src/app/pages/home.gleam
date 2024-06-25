@@ -14,10 +14,9 @@ import lustre/element/svg
 pub fn root(items: List(Item)) -> Element(t) {
   html.div([attribute.class("flex")], [
     html.div([attribute.class("flex-1")], [
-      html.div(
-        [attribute.class("text-2xl text-center bg-orange-700 rounded-md m-1.5")],
-        [element.text("To Do")],
-      ),
+      html.div([class("text-2xl text-center bg-orange-700 rounded-md m-1.5")], [
+        element.text("To Do"),
+      ]),
       todos(
         list.filter(items, fn(item) {
           item.status |> string_to_item_status == item.Todo
@@ -30,6 +29,7 @@ pub fn root(items: List(Item)) -> Element(t) {
         [element.text("Doing")],
       ),
       others(
+        attribute.attribute("data-testid", "doing-items"),
         list.filter(items, fn(item) {
           item.status |> string_to_item_status == item.Doing
         }),
@@ -41,6 +41,7 @@ pub fn root(items: List(Item)) -> Element(t) {
         [element.text("Done")],
       ),
       others(
+        attribute.attribute("data-testid", "done-items"),
         list.filter(items, fn(item) {
           item.status |> string_to_item_status == item.Done
         }),
@@ -50,7 +51,7 @@ pub fn root(items: List(Item)) -> Element(t) {
 }
 
 fn todos(items: List(Item)) -> Element(t) {
-  html.div([], [
+  html.div([attribute.attribute("data-testid", "todo-items")], [
     html.ul(
       [],
       items
@@ -60,8 +61,8 @@ fn todos(items: List(Item)) -> Element(t) {
   ])
 }
 
-fn others(items: List(Item)) -> Element(t) {
-  html.div([], [
+fn others(attribute: attribute.Attribute(t), items: List(Item)) -> Element(t) {
+  html.div([attribute], [
     html.ul(
       [],
       items
@@ -106,7 +107,11 @@ fn toggle_next(item: Item) -> Element(t) {
         <> "?_method=PATCH",
       ),
     ],
-    [button([], [svg_icon_angle_right()])],
+    [
+      button([attribute.attribute("data-testid", "toggle-next")], [
+        svg_icon_angle_right(),
+      ]),
+    ],
   )
 }
 
@@ -124,7 +129,11 @@ fn item(item: Item) -> Element(t) {
               <> "?_method=DELETE",
             ),
           ],
-          [button([], [svg_icon_delete()])],
+          [
+            button([attribute.attribute("data-testid", "delete-todo")], [
+              svg_icon_delete(),
+            ]),
+          ],
         ),
         toggle_next(item),
       ]),
@@ -149,9 +158,13 @@ fn todo_input() -> Element(t) {
             ],
             "",
           ),
-          html.button([class("bg-black text-white font-bold px-4 rounded")], [
-            element.text("OK"),
-          ]),
+          html.button(
+            [
+              attribute.attribute("data-testid", "create-todo"),
+              class("bg-black text-white font-bold px-4 rounded"),
+            ],
+            [element.text("OK")],
+          ),
         ]),
       ]),
     ]),
