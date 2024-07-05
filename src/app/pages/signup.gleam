@@ -66,6 +66,7 @@ pub fn root() -> Element(t) {
                   attribute.name("password"),
                   attribute.type_("password"),
                   attribute.autocomplete("current-password"),
+                  attribute.attribute("minlength", "8"),
                   attribute.attribute("required", ""),
                 ]),
               ]),
