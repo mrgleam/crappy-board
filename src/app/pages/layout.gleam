@@ -12,6 +12,6 @@ pub fn layout(elements: List(Element(t))) -> Element(t) {
       ]),
       html.link([attribute.rel("stylesheet"), attribute.href("/static/app.css")]),
     ]),
-    html.body([], elements),
+    html.body([attribute.class("bg-gray-900")], elements),
   ])
 }

@@ -2,6 +2,7 @@ import app/models/item
 import app/pages
 import app/pages/layout.{layout}
 import app/routes/item_routes
+import app/routes/user_routes
 import app/web.{type Context}
 import gleam/http
 import lustre/element
@@ -12,6 +13,7 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
 
   case wisp.path_segments(req) {
     [] -> home(ctx)
+    ["signup"] -> signup(req, ctx)
     ["items", "create"] -> {
       use <- wisp.require_method(req, http.Post)
       item_routes.post_create_item(req, ctx)
@@ -46,6 +48,21 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
 fn home(ctx: Context) -> Response {
   let items = item.list_items(ctx.db)
   [pages.home(items)]
+  |> layout
+  |> element.to_document_string_builder
+  |> wisp.html_response(200)
+}
+
+fn signup(req: Request, ctx: Context) -> Response {
+  case req.method {
+    http.Get -> get_signup_form()
+    http.Post -> user_routes.post_create_user(req, ctx)
+    _ -> wisp.method_not_allowed([http.Get, http.Post])
+  }
+}
+
+fn get_signup_form() -> Response {
+  [pages.signup()]
   |> layout
   |> element.to_document_string_builder
   |> wisp.html_response(200)
