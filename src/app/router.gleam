@@ -5,6 +5,8 @@ import app/routes/item_routes
 import app/routes/user_routes
 import app/web.{type Context}
 import gleam/http
+import gleam/list
+import gleam/result
 import lustre/element
 import wisp.{type Request, type Response}
 
@@ -55,14 +57,15 @@ fn home(ctx: Context) -> Response {
 
 fn signup(req: Request, ctx: Context) -> Response {
   case req.method {
-    http.Get -> get_signup_form()
+    http.Get -> get_signup_form(req)
     http.Post -> user_routes.post_create_user(req, ctx)
     _ -> wisp.method_not_allowed([http.Get, http.Post])
   }
 }
 
-fn get_signup_form() -> Response {
-  [pages.signup()]
+fn get_signup_form(req: Request) -> Response {
+  let queries = wisp.get_query(req)
+  [pages.signup(result.unwrap(list.key_find(queries, "error"), ""))]
   |> layout
   |> element.to_document_string_builder
   |> wisp.html_response(200)

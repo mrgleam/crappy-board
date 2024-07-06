@@ -25,7 +25,7 @@ pub fn post_create_user(req: Request, ctx: Context) {
       wisp.redirect("/")
     }
     Error(_) -> {
-      wisp.bad_request()
+      wisp.redirect("/signup?error=The email you entered is incorrect")
     }
   }
 }

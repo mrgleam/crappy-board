@@ -6,6 +6,6 @@ pub fn home(items: List(Item)) {
   home.root(items)
 }
 
-pub fn signup() {
-  signup.root()
+pub fn signup(error: String) {
+  signup.root(error)
 }

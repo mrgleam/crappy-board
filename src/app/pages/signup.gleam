@@ -2,7 +2,7 @@ import lustre/attribute.{attribute}
 import lustre/element.{type Element}
 import lustre/element/html
 
-pub fn root() -> Element(t) {
+pub fn root(error: String) -> Element(t) {
   html.div(
     [
       attribute.class(
@@ -103,6 +103,10 @@ pub fn root() -> Element(t) {
                 [element.text("Register Account")],
               ),
             ]),
+            html.div(
+              [attribute.class("text-center text-red-600 font-bold text-xl")],
+              [element.text(error)],
+            ),
           ],
         ),
       ]),
