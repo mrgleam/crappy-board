@@ -17,7 +17,7 @@ pub fn root(error: String) -> Element(t) {
               "mt-10 text-center text-2xl font-bold leading-9 tracking-tight",
             ),
           ],
-          [element.text("Create an Account!")],
+          [element.text("Sign in to your account")],
         ),
       ]),
       html.div([attribute.class("mt-10 sm:mx-auto sm:w-full sm:max-w-sm")], [
@@ -25,7 +25,7 @@ pub fn root(error: String) -> Element(t) {
           [
             attribute.class("space-y-6"),
             attribute.method("POST"),
-            attribute.action("/signup"),
+            attribute.action("/signin"),
           ],
           [
             html.div([], [
@@ -72,27 +72,6 @@ pub fn root(error: String) -> Element(t) {
               ]),
             ]),
             html.div([], [
-              html.label(
-                [
-                  attribute.for("confirm-password"),
-                  attribute.class("block text-sm font-medium leading-6"),
-                ],
-                [element.text("Confirm Password")],
-              ),
-              html.div([attribute.class("mt-2")], [
-                html.input([
-                  attribute.class(
-                    "block w-full bg-white/[.05] rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-white/[.1] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6",
-                  ),
-                  attribute.id("confirm-password"),
-                  attribute.name("confirm-password"),
-                  attribute.type_("password"),
-                  attribute.autocomplete("current-password"),
-                  attribute.attribute("required", ""),
-                ]),
-              ]),
-            ]),
-            html.div([], [
               html.button(
                 [
                   attribute.type_("sumbit"),
@@ -100,7 +79,7 @@ pub fn root(error: String) -> Element(t) {
                     "flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600",
                   ),
                 ],
-                [element.text("Register Account")],
+                [element.text("Sign in")],
               ),
             ]),
             html.div(

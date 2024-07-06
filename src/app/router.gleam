@@ -16,6 +16,7 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
   case wisp.path_segments(req) {
     [] -> home(ctx)
     ["signup"] -> signup(req, ctx)
+    ["signin"] -> signin(req, ctx)
     ["items", "create"] -> {
       use <- wisp.require_method(req, http.Post)
       item_routes.post_create_item(req, ctx)
@@ -66,6 +67,21 @@ fn signup(req: Request, ctx: Context) -> Response {
 fn get_signup_form(req: Request) -> Response {
   let queries = wisp.get_query(req)
   [pages.signup(result.unwrap(list.key_find(queries, "error"), ""))]
+  |> layout
+  |> element.to_document_string_builder
+  |> wisp.html_response(200)
+}
+
+fn signin(req: Request, ctx: Context) -> Response {
+  case req.method {
+    http.Get -> get_signin_form()
+    http.Post -> user_routes.post_signin_user(req, ctx)
+    _ -> wisp.method_not_allowed([http.Get, http.Post])
+  }
+}
+
+fn get_signin_form() -> Response {
+  [pages.signin("")]
   |> layout
   |> element.to_document_string_builder
   |> wisp.html_response(200)
