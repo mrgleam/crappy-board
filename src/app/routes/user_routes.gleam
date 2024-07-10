@@ -25,10 +25,16 @@ pub fn post_create_user(req: Request, ctx: Context) {
   }
   case result {
     Ok(_) -> {
-      wisp.redirect("/")
+      [pages.signup_success()]
+      |> layout
+      |> element.to_document_string_builder
+      |> wisp.html_response(200)
     }
     Error(_) -> {
-      wisp.redirect("/signup?error=The email you entered is incorrect")
+      [pages.signup("The email you entered is incorrect")]
+      |> layout
+      |> element.to_document_string_builder
+      |> wisp.html_response(200)
     }
   }
 }
