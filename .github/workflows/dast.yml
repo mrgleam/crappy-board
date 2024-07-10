@@ -1,0 +1,62 @@
+name: DAST
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  dast:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: crappy_test
+
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run migrations
+      run: psql -f migrations/init.sql postgresql://postgres:postgres@localhost:5432/crappy_test
+    - name: Set up Gleam, Beam
+      uses: erlef/setup-beam@v1
+      with:
+        otp-version: "26.0.2"
+        gleam-version: "1.2.0"
+        rebar3-version: "3"
+    - name: "Start Backend"
+      env:
+        SECRET_KEY_BASE: test-secret-key
+        PG_USER: postgres
+        PG_PASSWORD: postgres
+        PG_HOST: localhost
+        PG_PORT: 5432
+        PG_DB: crappy_test
+      run: |
+        gleam run &
+        sleep 30 &&
+        curl http://localhost:8000 -I
+    - name: ZAP Scan
+      uses: zaproxy/action-full-scan@v0.10.0
+      with:
+        docker_name: 'owasp/zap2docker-stable'
+        target: 'http://localhost:8000'
+        cmd_options: '-a -r /reports/full-scan.html'
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: dast-report
+        path: reports/
+        retention-days: 30
