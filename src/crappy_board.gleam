@@ -36,7 +36,7 @@ pub fn main() {
       ),
     )
 
-  let ctx = Context(static_directory: static_directory(), db: db)
+  let ctx = Context(static_directory: static_directory(), db: db, user_id: "")
 
   let handler = router.handle_request(_, ctx)
 

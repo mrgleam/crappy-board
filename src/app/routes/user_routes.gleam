@@ -1,8 +1,9 @@
 import app/error
+import app/helpers/uuid
 import app/models/user.{create_user, signin_user}
 import app/pages
 import app/pages/layout.{layout}
-import app/web.{type Context, Context}
+import app/web.{type Context, Context, uid_cookie}
 import gleam/list
 import gleam/result
 import lustre/element
@@ -52,11 +53,16 @@ pub fn post_signin_user(req: Request, ctx: Context) {
       list.key_find(form.values, "password")
       |> result.map_error(fn(_) { error.BadRequest }),
     )
-    signin_user(user_email, user_password, ctx.db)
+    use user <- result.try(
+      signin_user(user_email, user_password, ctx.db)
+      |> result.map_error(fn(_) { error.BadRequest }),
+    )
+    uuid.cast(user.id) |> result.map_error(fn(_) { error.BadRequest })
   }
   case result {
-    Ok(_) -> {
+    Ok(user_id) -> {
       wisp.redirect("/")
+      |> wisp.set_cookie(req, uid_cookie, user_id, wisp.Signed, 60 * 60)
     }
     Error(_) -> {
       [pages.signin("The email or password you entered is incorrect")]

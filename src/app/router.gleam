@@ -12,26 +12,34 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
   use req <- web.middleware(req, ctx)
 
   case wisp.path_segments(req) {
-    [] -> home(ctx)
+    [] -> {
+      use ctx <- web.authenticate(req, ctx)
+      home(ctx)
+    }
     ["signup"] -> signup(req, ctx)
     ["signin"] -> signin(req, ctx)
     ["items", "create"] -> {
+      use ctx <- web.authenticate(req, ctx)
       use <- wisp.require_method(req, http.Post)
       item_routes.post_create_item(req, ctx)
     }
     ["items", id] -> {
+      use ctx <- web.authenticate(req, ctx)
       use <- wisp.require_method(req, http.Delete)
       item_routes.post_delete_item(ctx, id)
     }
     ["items", id, "todo"] -> {
+      use ctx <- web.authenticate(req, ctx)
       use <- wisp.require_method(req, http.Patch)
       item_routes.patch_todo(ctx, id)
     }
     ["items", id, "doing"] -> {
+      use ctx <- web.authenticate(req, ctx)
       use <- wisp.require_method(req, http.Patch)
       item_routes.patch_doing(ctx, id)
     }
     ["items", id, "done"] -> {
+      use ctx <- web.authenticate(req, ctx)
       use <- wisp.require_method(req, http.Patch)
       item_routes.patch_done(ctx, id)
     }

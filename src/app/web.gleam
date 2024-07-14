@@ -1,10 +1,29 @@
 import gleam/bool
+import gleam/option
 import gleam/pgo.{type Connection}
 import gleam/string_builder
-import wisp
+import wisp.{type Request, type Response}
 
 pub type Context {
-  Context(static_directory: String, db: Connection)
+  Context(static_directory: String, db: Connection, user_id: String)
+}
+
+pub const uid_cookie = "uid"
+
+pub fn authenticate(
+  req: Request,
+  ctx: Context,
+  next: fn(Context) -> Response,
+) -> Response {
+  let id = wisp.get_cookie(req, uid_cookie, wisp.Signed) |> option.from_result
+
+  case id {
+    option.None -> wisp.redirect("/signin")
+    option.Some(id) -> {
+      let context = Context(..ctx, user_id: id)
+      next(context)
+    }
+  }
 }
 
 pub fn middleware(

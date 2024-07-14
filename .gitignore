@@ -6,3 +6,5 @@ erl_crash.dump
 *.swp
 /postgres
 .env
+
+e2e/playwright
