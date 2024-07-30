@@ -18,6 +18,10 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
     }
     ["signup"] -> signup(req, ctx)
     ["signin"] -> signin(req, ctx)
+    ["signout"] -> {
+      use <- wisp.require_method(req, http.Post)
+      user_routes.post_sign_out()
+    }
     ["items", "create"] -> {
       use ctx <- web.authenticate(req, ctx)
       use <- wisp.require_method(req, http.Post)

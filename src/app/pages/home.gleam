@@ -12,40 +12,54 @@ import lustre/element/html.{button, form, svg, textarea}
 import lustre/element/svg
 
 pub fn root(items: List(Item)) -> Element(t) {
-  html.div([attribute.class("flex")], [
-    html.div([attribute.class("flex-1")], [
-      html.div([class("text-2xl text-center bg-orange-700 rounded-md m-1.5")], [
-        element.text("To Do"),
+  html.div([attribute.class("flex flex-col")], [
+    html.div([attribute.class("flex justify-end")], [
+      form([attribute.method("POST"), attribute.action("/signout")], [
+        button([attribute.class("bg-indigo-500 rounded p-1 m-1.5")], [
+          element.text("Sign out"),
+        ]),
       ]),
-      todos(
-        list.filter(items, fn(item) {
-          item.status |> string_to_item_status == item.Todo
-        }),
-      ),
     ]),
-    html.div([attribute.class("flex-1")], [
-      html.div(
-        [attribute.class("text-2xl text-center bg-cyan-700 rounded-md m-1.5")],
-        [element.text("Doing")],
-      ),
-      others(
-        attribute.attribute("data-testid", "doing-items"),
-        list.filter(items, fn(item) {
-          item.status |> string_to_item_status == item.Doing
-        }),
-      ),
-    ]),
-    html.div([attribute.class("flex-1")], [
-      html.div(
-        [attribute.class("text-2xl text-center bg-green-700 rounded-md m-1.5")],
-        [element.text("Done")],
-      ),
-      others(
-        attribute.attribute("data-testid", "done-items"),
-        list.filter(items, fn(item) {
-          item.status |> string_to_item_status == item.Done
-        }),
-      ),
+    html.div([attribute.class("flex")], [
+      html.div([attribute.class("flex-1")], [
+        html.div(
+          [class("text-2xl text-center bg-orange-700 rounded-md m-1.5")],
+          [element.text("To Do")],
+        ),
+        todos(
+          list.filter(items, fn(item) {
+            item.status |> string_to_item_status == item.Todo
+          }),
+        ),
+      ]),
+      html.div([attribute.class("flex-1")], [
+        html.div(
+          [attribute.class("text-2xl text-center bg-cyan-700 rounded-md m-1.5")],
+          [element.text("Doing")],
+        ),
+        others(
+          attribute.attribute("data-testid", "doing-items"),
+          list.filter(items, fn(item) {
+            item.status |> string_to_item_status == item.Doing
+          }),
+        ),
+      ]),
+      html.div([attribute.class("flex-1")], [
+        html.div(
+          [
+            attribute.class(
+              "text-2xl text-center bg-green-700 rounded-md m-1.5",
+            ),
+          ],
+          [element.text("Done")],
+        ),
+        others(
+          attribute.attribute("data-testid", "done-items"),
+          list.filter(items, fn(item) {
+            item.status |> string_to_item_status == item.Done
+          }),
+        ),
+      ]),
     ]),
   ])
 }

@@ -766,6 +766,10 @@ select {
   flex-direction: column;
 }
 
+.justify-end {
+  justify-content: flex-end;
+}
+
 .justify-center {
   justify-content: center;
 }
@@ -812,6 +816,11 @@ select {
   background-color: rgb(21 128 61 / var(--tw-bg-opacity));
 }
 
+.bg-indigo-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(99 102 241 / var(--tw-bg-opacity));
+}
+
 .bg-indigo-600 {
   --tw-bg-opacity: 1;
   background-color: rgb(79 70 229 / var(--tw-bg-opacity));
@@ -824,6 +833,10 @@ select {
 
 .bg-white\/\[\.05\] {
   background-color: rgb(255 255 255 / .05);
+}
+
+.p-1 {
+  padding: 0.25rem;
 }
 
 .px-3 {

@@ -4,7 +4,11 @@ import app/models/user.{create_user, signin_user}
 import app/pages
 import app/pages/layout.{layout}
 import app/web.{type Context, Context, uid_cookie}
+import gleam/http.{Http}
+import gleam/http/cookie
+import gleam/http/response
 import gleam/list
+import gleam/option
 import gleam/result
 import lustre/element
 import wisp.{type Request}
@@ -71,4 +75,11 @@ pub fn post_signin_user(req: Request, ctx: Context) {
       |> wisp.html_response(200)
     }
   }
+}
+
+pub fn post_sign_out() {
+  let attributes =
+    cookie.Attributes(..cookie.defaults(Http), max_age: option.Some(0))
+  wisp.redirect("/")
+  |> response.set_cookie(uid_cookie, "", attributes)
 }
