@@ -82,6 +82,10 @@ pub fn root(error: String) -> Element(t) {
                 [element.text("Sign in")],
               ),
             ]),
+            html.div([], [
+              element.text("Don't have an account yet? "),
+              html.a([attribute.class("text-indigo-600"), attribute.href("/signup")], [element.text("Sign up")]),
+            ]),
             html.div(
               [attribute.class("text-center text-red-600 font-bold text-lg")],
               [element.text(error)],
