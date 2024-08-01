@@ -13,9 +13,10 @@ import lustre/element/svg
 
 pub fn root(items: List(Item)) -> Element(t) {
   html.div([attribute.class("flex flex-col")], [
-    html.div([attribute.class("flex justify-end")], [
+    html.div([attribute.class("flex justify-between m-1.5")], [
+      html.h2([], [element.text("Crappy Board")]),
       form([attribute.method("POST"), attribute.action("/signout")], [
-        button([attribute.class("bg-indigo-500 rounded p-1 m-1.5")], [
+        button([attribute.class("bg-indigo-500 rounded p-1")], [
           element.text("Sign out"),
         ]),
       ]),
