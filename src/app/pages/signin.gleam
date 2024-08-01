@@ -50,13 +50,26 @@ pub fn root(error: String) -> Element(t) {
               ]),
             ]),
             html.div([], [
-              html.label(
-                [
-                  attribute.for("password"),
-                  attribute.class("block text-sm font-medium leading-6"),
-                ],
-                [element.text("Password")],
-              ),
+              html.div([attribute.class("flex items-center justify-between")], [
+                html.label(
+                  [
+                    attribute.for("password"),
+                    attribute.class("block text-sm font-medium leading-6"),
+                  ],
+                  [element.text("Password")],
+                ),
+                html.div([attribute.class("text-sm")], [
+                  html.a(
+                    [
+                      attribute.class(
+                        "font-semibold text-indigo-600 hover:text-indigo-500",
+                      ),
+                      attribute.href("/forgot-password"),
+                    ],
+                    [element.text("Forgot password?")],
+                  ),
+                ]),
+              ]),
               html.div([attribute.class("mt-2")], [
                 html.input([
                   attribute.class(
@@ -82,9 +95,17 @@ pub fn root(error: String) -> Element(t) {
                 [element.text("Sign in")],
               ),
             ]),
-            html.div([], [
+            html.div([attribute.class("text-sm")], [
               element.text("Don't have an account yet? "),
-              html.a([attribute.class("text-indigo-600"), attribute.href("/signup")], [element.text("Sign up")]),
+              html.a(
+                [
+                  attribute.class(
+                    "font-semibold text-indigo-600 hover:text-indigo-500",
+                  ),
+                  attribute.href("/signup"),
+                ],
+                [element.text("Sign up")],
+              ),
             ]),
             html.div(
               [attribute.class("text-center text-red-600 font-bold text-lg")],
