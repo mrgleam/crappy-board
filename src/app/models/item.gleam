@@ -105,7 +105,7 @@ pub fn delete_item(item_id: String, db: Connection) -> Result(Int, AppError) {
 pub fn patch_item(item_id: String, status: ItemStatus, db: Connection) {
   let sql =
     "
-      UPDATE tasks SET status = $1 WHERE id = $2
+      UPDATE tasks SET status = $1, updated_at = NOW() WHERE id = $2
     "
   use returned <- result.then(
     pgo.execute(
