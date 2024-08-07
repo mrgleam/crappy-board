@@ -1,5 +1,7 @@
 import app/error
 import app/helpers/uuid
+import app/models/board.{create_board}
+import app/models/board_user.{create_board_user}
 import app/models/user.{create_user, signin_user}
 import app/pages
 import app/pages/layout.{layout}
@@ -26,7 +28,24 @@ pub fn post_create_user(req: Request, ctx: Context) {
       list.key_find(form.values, "password")
       |> result.map_error(fn(_) { error.BadRequest }),
     )
-    create_user(user_email, user_password, ctx.db)
+
+    use user_id <- result.try(
+      create_user(user_email, user_password, ctx.db)
+      |> result.map(fn(user_id) {
+        uuid.cast(user_id) |> result.map_error(fn(_) { error.BadRequest })
+      })
+      |> result.flatten,
+    )
+
+    use board_id <- result.try(
+      create_board(user_id, ctx.db)
+      |> result.map(fn(board_id) {
+        uuid.cast(board_id) |> result.map_error(fn(_) { error.BadRequest })
+      })
+      |> result.flatten,
+    )
+
+    create_board_user(board_id, user_id, ctx.db)
   }
   case result {
     Ok(_) -> {
