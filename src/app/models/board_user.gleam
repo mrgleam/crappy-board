@@ -21,12 +21,7 @@ pub fn create_board_user(
           ($1, $2)
       "
   use returned <- result.then(
-    pgo.execute(
-      sql,
-      db,
-      [pgo.text(board_id), pgo.text(user_id)],
-      dynamic.int,
-    )
+    pgo.execute(sql, db, [pgo.text(board_id), pgo.text(user_id)], dynamic.int)
     |> result.map_error(fn(error) {
       io.debug(error)
       case error {

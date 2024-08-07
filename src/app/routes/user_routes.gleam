@@ -76,10 +76,12 @@ pub fn post_signin_user(req: Request, ctx: Context) {
       list.key_find(form.values, "password")
       |> result.map_error(fn(_) { error.BadRequest }),
     )
+
     use user <- result.try(
       signin_user(user_email, user_password, ctx.db)
       |> result.map_error(fn(_) { error.BadRequest }),
     )
+
     uuid.cast(user.id) |> result.map_error(fn(_) { error.BadRequest })
   }
   case result {
