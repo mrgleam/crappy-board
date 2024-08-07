@@ -10,9 +10,9 @@ import gleam/http.{Http}
 import gleam/http/cookie
 import gleam/http/response
 import gleam/list
-import gleam/string
 import gleam/option
 import gleam/result
+import gleam/string
 import lustre/element
 import wisp.{type Request}
 

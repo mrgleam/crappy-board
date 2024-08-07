@@ -3,9 +3,9 @@ import app/models/item.{
   type Item, item_status_to_string, next_status, prev_status,
   string_to_item_status,
 }
+import gleam/function.{curry2}
 import gleam/list
 import gleam/result
-import gleam/function.{curry2}
 import gleam/string.{lowercase}
 import lustre/attribute.{attribute, autofocus, class, name, placeholder, rows}
 import lustre/element.{type Element}
@@ -80,7 +80,11 @@ fn todos(board_id: String, items: List(Item)) -> Element(t) {
   ])
 }
 
-fn others(attribute: attribute.Attribute(t), board_id: String, items: List(Item)) -> Element(t) {
+fn others(
+  attribute: attribute.Attribute(t),
+  board_id: String,
+  items: List(Item),
+) -> Element(t) {
   html.div([attribute], [
     html.ul(
       [],
@@ -170,28 +174,34 @@ fn item(board_id: String, item: Item) -> Element(t) {
 fn todo_input(board_id: String) -> Element(t) {
   html.li([], [
     html.a([attribute.href("#")], [
-      form([attribute.method("POST"), attribute.action("/boards/" <> board_id <> "/items/create")], [
-        html.div([class("flex flex-col")], [
-          textarea(
-            [
-              class("todo_input"),
-              rows(4),
-              attribute("maxlength", "32"),
-              name("todo_input"),
-              placeholder("What needs to be done?"),
-              autofocus(True),
-            ],
-            "",
-          ),
-          html.button(
-            [
-              attribute.attribute("data-testid", "create-todo"),
-              class("bg-black text-white font-bold px-4 rounded"),
-            ],
-            [element.text("OK")],
-          ),
-        ]),
-      ]),
+      form(
+        [
+          attribute.method("POST"),
+          attribute.action("/boards/" <> board_id <> "/items/create"),
+        ],
+        [
+          html.div([class("flex flex-col")], [
+            textarea(
+              [
+                class("todo_input"),
+                rows(4),
+                attribute("maxlength", "32"),
+                name("todo_input"),
+                placeholder("What needs to be done?"),
+                autofocus(True),
+              ],
+              "",
+            ),
+            html.button(
+              [
+                attribute.attribute("data-testid", "create-todo"),
+                class("bg-black text-white font-bold px-4 rounded"),
+              ],
+              [element.text("OK")],
+            ),
+          ]),
+        ],
+      ),
     ]),
   ])
 }
