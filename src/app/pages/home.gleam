@@ -5,13 +5,14 @@ import app/models/item.{
 }
 import gleam/list
 import gleam/result
+import gleam/function.{curry2}
 import gleam/string.{lowercase}
 import lustre/attribute.{attribute, autofocus, class, name, placeholder, rows}
 import lustre/element.{type Element}
 import lustre/element/html.{button, form, svg, textarea}
 import lustre/element/svg
 
-pub fn root(items: List(Item)) -> Element(t) {
+pub fn root(board_id: String, items: List(Item)) -> Element(t) {
   html.div([attribute.class("flex flex-col")], [
     html.div([attribute.class("flex justify-between m-1.5")], [
       html.h2([], [element.text("Crappy Board")]),
@@ -28,6 +29,7 @@ pub fn root(items: List(Item)) -> Element(t) {
           [element.text("To Do")],
         ),
         todos(
+          board_id,
           list.filter(items, fn(item) {
             item.status |> string_to_item_status == item.Todo
           }),
@@ -40,6 +42,7 @@ pub fn root(items: List(Item)) -> Element(t) {
         ),
         others(
           attribute.attribute("data-testid", "doing-items"),
+          board_id,
           list.filter(items, fn(item) {
             item.status |> string_to_item_status == item.Doing
           }),
@@ -56,6 +59,7 @@ pub fn root(items: List(Item)) -> Element(t) {
         ),
         others(
           attribute.attribute("data-testid", "done-items"),
+          board_id,
           list.filter(items, fn(item) {
             item.status |> string_to_item_status == item.Done
           }),
@@ -65,33 +69,35 @@ pub fn root(items: List(Item)) -> Element(t) {
   ])
 }
 
-fn todos(items: List(Item)) -> Element(t) {
+fn todos(board_id: String, items: List(Item)) -> Element(t) {
   html.div([attribute.attribute("data-testid", "todo-items")], [
     html.ul(
       [],
       items
-        |> list.map(item)
-        |> list.prepend(todo_input()),
+        |> list.map(curry2(item)(board_id))
+        |> list.prepend(todo_input(board_id)),
     ),
   ])
 }
 
-fn others(attribute: attribute.Attribute(t), items: List(Item)) -> Element(t) {
+fn others(attribute: attribute.Attribute(t), board_id: String, items: List(Item)) -> Element(t) {
   html.div([attribute], [
     html.ul(
       [],
       items
-        |> list.map(item),
+        |> list.map(curry2(item)(board_id)),
     ),
   ])
 }
 
-fn toggle_prev(item: Item) -> Element(t) {
+fn toggle_prev(board_id: String, item: Item) -> Element(t) {
   form(
     [
       attribute.method("POST"),
       attribute.action(
-        "/items/"
+        "/boards/"
+        <> board_id
+        <> "/items/"
         <> result.unwrap(uuid.cast(item.id), "")
         <> "/"
         <> item.status
@@ -106,12 +112,14 @@ fn toggle_prev(item: Item) -> Element(t) {
   )
 }
 
-fn toggle_next(item: Item) -> Element(t) {
+fn toggle_next(board_id: String, item: Item) -> Element(t) {
   form(
     [
       attribute.method("POST"),
       attribute.action(
-        "/items/"
+        "/boards/"
+        <> board_id
+        <> "/items/"
         <> result.unwrap(uuid.cast(item.id), "")
         <> "/"
         <> item.status
@@ -130,16 +138,18 @@ fn toggle_next(item: Item) -> Element(t) {
   )
 }
 
-fn item(item: Item) -> Element(t) {
+fn item(board_id: String, item: Item) -> Element(t) {
   html.li([], [
     html.a([attribute.href("#")], [
       html.div([class("flex flex-row justify-between navigate")], [
-        toggle_prev(item),
+        toggle_prev(board_id, item),
         form(
           [
             attribute.method("POST"),
             attribute.action(
-              "/items/"
+              "/boards/"
+              <> board_id
+              <> "/items/"
               <> result.unwrap(uuid.cast(item.id), "")
               <> "?_method=DELETE",
             ),
@@ -150,17 +160,17 @@ fn item(item: Item) -> Element(t) {
             ]),
           ],
         ),
-        toggle_next(item),
+        toggle_next(board_id, item),
       ]),
       html.p([], [element.text(item.content)]),
     ]),
   ])
 }
 
-fn todo_input() -> Element(t) {
+fn todo_input(board_id: String) -> Element(t) {
   html.li([], [
     html.a([attribute.href("#")], [
-      form([attribute.method("POST"), attribute.action("/items/create")], [
+      form([attribute.method("POST"), attribute.action("/boards/" <> board_id <> "/items/create")], [
         html.div([class("flex flex-col")], [
           textarea(
             [

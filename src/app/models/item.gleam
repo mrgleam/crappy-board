@@ -32,15 +32,16 @@ pub fn item_row_decoder() -> dynamic.Decoder(Item) {
 /// Insert a new item for a given user.
 ///
 pub fn create_item(
+  board_id: String,
   content: String,
   db: Connection,
 ) -> Result(BitArray, AppError) {
   let sql =
     "
       INSERT INTO tasks
-        (content, status) 
+        (content, status, board_id) 
       VALUES 
-        ($1, 'TODO')
+        ($1, 'TODO', $2)
       RETURNING
         id
     "
@@ -48,7 +49,7 @@ pub fn create_item(
     pgo.execute(
       sql,
       db,
-      [pgo.text(content)],
+      [pgo.text(content), pgo.text(board_id)],
       dynamic.element(0, dynamic.bit_array),
     )
     |> result.map_error(fn(error) {
@@ -64,7 +65,7 @@ pub fn create_item(
   Ok(id)
 }
 
-pub fn list_items(db: Connection) -> List(Item) {
+pub fn list_items(board_id: String, db: Connection) -> List(Item) {
   let sql =
     "
       SELECT
@@ -73,22 +74,28 @@ pub fn list_items(db: Connection) -> List(Item) {
         status
       FROM
         tasks
+      WHERE board_id = $1
       ORDER BY
         created_at asc
     "
 
-  let assert Ok(returned) = pgo.execute(sql, db, [], item_row_decoder())
+  let assert Ok(returned) =
+    pgo.execute(sql, db, [pgo.text(board_id)], item_row_decoder())
 
   returned.rows
 }
 
-pub fn delete_item(item_id: String, db: Connection) -> Result(Int, AppError) {
+pub fn delete_item(
+  board_id: String,
+  item_id: String,
+  db: Connection,
+) -> Result(Int, AppError) {
   let sql =
     "
-      DELETE FROM tasks WHERE id = $1
+      DELETE FROM tasks WHERE id = $1 AND board_id = $2
     "
   use returned <- result.then(
-    pgo.execute(sql, db, [pgo.text(item_id)], dynamic.int)
+    pgo.execute(sql, db, [pgo.text(item_id), pgo.text(board_id)], dynamic.int)
     |> result.map_error(fn(error) {
       io.debug(error)
       case error {
@@ -102,16 +109,25 @@ pub fn delete_item(item_id: String, db: Connection) -> Result(Int, AppError) {
   Ok(count)
 }
 
-pub fn patch_item(item_id: String, status: ItemStatus, db: Connection) {
+pub fn patch_item(
+  board_id: String,
+  item_id: String,
+  status: ItemStatus,
+  db: Connection,
+) {
   let sql =
     "
-      UPDATE tasks SET status = $1, updated_at = NOW() WHERE id = $2
+      UPDATE tasks SET status = $1, updated_at = NOW() WHERE id = $2 AND board_id = $3
     "
   use returned <- result.then(
     pgo.execute(
       sql,
       db,
-      [pgo.text(item_status_to_string(status)), pgo.text(item_id)],
+      [
+        pgo.text(item_status_to_string(status)),
+        pgo.text(item_id),
+        pgo.text(board_id),
+      ],
       dynamic.int,
     )
     |> result.map_error(fn(error) {

@@ -14,7 +14,15 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
   case wisp.path_segments(req) {
     [] -> {
       use ctx <- web.authenticate(req, ctx)
-      home(ctx)
+      home("", ctx)
+    }
+    ["boards"] -> {
+      use ctx <- web.authenticate(req, ctx)
+      home("", ctx)
+    }
+    ["boards", board_id] -> {
+      use ctx <- web.authenticate(req, ctx)
+      home(board_id, ctx)
     }
     ["signup"] -> signup(req, ctx)
     ["signin"] -> signin(req, ctx)
@@ -22,30 +30,30 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
       use <- wisp.require_method(req, http.Post)
       user_routes.post_sign_out()
     }
-    ["items", "create"] -> {
+    ["boards", board_id, "items", "create"] -> {
       use ctx <- web.authenticate(req, ctx)
       use <- wisp.require_method(req, http.Post)
-      item_routes.post_create_item(req, ctx)
+      item_routes.post_create_item(req, ctx, board_id)
     }
-    ["items", id] -> {
+    ["boards", board_id, "items", item_id] -> {
       use ctx <- web.authenticate(req, ctx)
       use <- wisp.require_method(req, http.Delete)
-      item_routes.post_delete_item(ctx, id)
+      item_routes.post_delete_item(ctx, board_id, item_id)
     }
-    ["items", id, "todo"] -> {
+    ["boards", board_id, "items", item_id, "todo"] -> {
       use ctx <- web.authenticate(req, ctx)
       use <- wisp.require_method(req, http.Patch)
-      item_routes.patch_todo(ctx, id)
+      item_routes.patch_todo(ctx, board_id, item_id)
     }
-    ["items", id, "doing"] -> {
+    ["boards", board_id, "items", item_id, "doing"] -> {
       use ctx <- web.authenticate(req, ctx)
       use <- wisp.require_method(req, http.Patch)
-      item_routes.patch_doing(ctx, id)
+      item_routes.patch_doing(ctx, board_id, item_id)
     }
-    ["items", id, "done"] -> {
+    ["boards", board_id, "items", item_id, "done"] -> {
       use ctx <- web.authenticate(req, ctx)
       use <- wisp.require_method(req, http.Patch)
-      item_routes.patch_done(ctx, id)
+      item_routes.patch_done(ctx, board_id, item_id)
     }
 
     // All the empty responses
@@ -58,9 +66,9 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
   }
 }
 
-fn home(ctx: Context) -> Response {
-  let items = item.list_items(ctx.db)
-  [pages.home(items)]
+fn home(board_id: String, ctx: Context) -> Response {
+  let items = item.list_items(board_id, ctx.db)
+  [pages.home(board_id, items)]
   |> layout
   |> element.to_document_string_builder
   |> wisp.html_response(200)

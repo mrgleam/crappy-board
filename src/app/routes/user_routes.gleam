@@ -1,7 +1,7 @@
 import app/error
 import app/helpers/uuid
 import app/models/board.{create_board}
-import app/models/board_user.{create_board_user}
+import app/models/board_user.{create_board_user, list_board_user}
 import app/models/user.{create_user, signin_user}
 import app/pages
 import app/pages/layout.{layout}
@@ -10,6 +10,7 @@ import gleam/http.{Http}
 import gleam/http/cookie
 import gleam/http/response
 import gleam/list
+import gleam/string
 import gleam/option
 import gleam/result
 import lustre/element
@@ -82,11 +83,18 @@ pub fn post_signin_user(req: Request, ctx: Context) {
       |> result.map_error(fn(_) { error.BadRequest }),
     )
 
-    uuid.cast(user.id) |> result.map_error(fn(_) { error.BadRequest })
+    uuid.cast(user.id)
+    |> result.map_error(fn(_) { error.BadRequest })
   }
   case result {
     Ok(user_id) -> {
-      wisp.redirect("/")
+      list_board_user(user_id, ctx.db)
+      |> board.first
+      |> board.get_string_id
+      |> list.wrap
+      |> list.prepend("boards")
+      |> string.join("/")
+      |> wisp.redirect
       |> wisp.set_cookie(req, uid_cookie, user_id, wisp.Signed, 60 * 60)
     }
     Error(_) -> {

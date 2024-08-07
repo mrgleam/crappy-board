@@ -4,8 +4,8 @@ import app/pages/signin
 import app/pages/signup
 import app/pages/signup_success
 
-pub fn home(items: List(Item)) {
-  home.root(items)
+pub fn home(board_id: String, items: List(Item)) {
+  home.root(board_id, items)
 }
 
 pub fn signup(error: String) {

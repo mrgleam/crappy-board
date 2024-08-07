@@ -5,7 +5,7 @@ import gleam/list
 import gleam/result
 import wisp.{type Request}
 
-pub fn post_create_item(req: Request, ctx: Context) {
+pub fn post_create_item(req: Request, ctx: Context, board_id: String) {
   use form <- wisp.require_form(req)
 
   let result = {
@@ -13,12 +13,12 @@ pub fn post_create_item(req: Request, ctx: Context) {
       list.key_find(form.values, "todo_input")
       |> result.map_error(fn(_) { error.BadRequest }),
     )
-    create_item(item_content, ctx.db)
+    create_item(board_id, item_content, ctx.db)
   }
 
   case result {
     Ok(_) -> {
-      wisp.redirect("/")
+      wisp.redirect("/boards/" <> board_id)
     }
     Error(_) -> {
       wisp.bad_request()
@@ -26,12 +26,12 @@ pub fn post_create_item(req: Request, ctx: Context) {
   }
 }
 
-pub fn post_delete_item(ctx: Context, item_id: String) {
-  let result = delete_item(item_id, ctx.db)
+pub fn post_delete_item(ctx: Context, board_id: String, item_id: String) {
+  let result = delete_item(board_id, item_id, ctx.db)
 
   case result {
     Ok(_) -> {
-      wisp.redirect("/")
+      wisp.redirect("/boards/" <> board_id)
     }
     Error(_) -> {
       wisp.bad_request()
@@ -39,11 +39,11 @@ pub fn post_delete_item(ctx: Context, item_id: String) {
   }
 }
 
-pub fn patch_todo(ctx: Context, item_id: String) {
-  let result = patch_item(item_id, item.Todo, ctx.db)
+pub fn patch_todo(ctx: Context, board_id: String, item_id: String) {
+  let result = patch_item(board_id, item_id, item.Todo, ctx.db)
   case result {
     Ok(_) -> {
-      wisp.redirect("/")
+      wisp.redirect("/boards/" <> board_id)
     }
     Error(_) -> {
       wisp.bad_request()
@@ -51,11 +51,11 @@ pub fn patch_todo(ctx: Context, item_id: String) {
   }
 }
 
-pub fn patch_doing(ctx: Context, item_id: String) {
-  let result = patch_item(item_id, item.Doing, ctx.db)
+pub fn patch_doing(ctx: Context, board_id: String, item_id: String) {
+  let result = patch_item(board_id, item_id, item.Doing, ctx.db)
   case result {
     Ok(_) -> {
-      wisp.redirect("/")
+      wisp.redirect("/boards/" <> board_id)
     }
     Error(_) -> {
       wisp.bad_request()
@@ -63,11 +63,11 @@ pub fn patch_doing(ctx: Context, item_id: String) {
   }
 }
 
-pub fn patch_done(ctx: Context, item_id: String) {
-  let result = patch_item(item_id, item.Done, ctx.db)
+pub fn patch_done(ctx: Context, board_id: String, item_id: String) {
+  let result = patch_item(board_id, item_id, item.Done, ctx.db)
   case result {
     Ok(_) -> {
-      wisp.redirect("/")
+      wisp.redirect("/boards/" <> board_id)
     }
     Error(_) -> {
       wisp.bad_request()

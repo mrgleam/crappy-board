@@ -1,4 +1,5 @@
 import app/error.{type AppError}
+import app/models/board.{type Board, board_row_decoder}
 import gleam/dynamic
 import gleam/io
 import gleam/pgo.{type Connection}
@@ -32,4 +33,25 @@ pub fn create_board_user(
 
   let count = returned.count
   Ok(count)
+}
+
+pub fn list_board_user(user_id: String, db: Connection) -> List(Board) {
+  let sql =
+    "
+      SELECT
+        board_id as id,
+        boards.owner_id
+      FROM
+        boards_users
+      INNER JOIN boards ON boards_users.board_id=boards.id
+      WHERE
+        boards_users.user_id = $1
+      ORDER BY
+        boards.created_at asc
+    "
+
+  let assert Ok(returned) =
+    pgo.execute(sql, db, [pgo.text(user_id)], board_row_decoder())
+
+  returned.rows
 }

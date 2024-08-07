@@ -1,9 +1,10 @@
-import { test, expect, Locator } from "@playwright/test";
+import { expect, Locator } from "@playwright/test";
+import { test } from './my-test';
 
 test.describe.configure({ mode: 'serial' });
 
-test.beforeEach(async ({ page }) => {
-  await page.goto("/");
+test.beforeEach(async ({ page, boardId }) => {
+  await page.goto(`/boards/${boardId}`);
 });
 
 test.afterEach(async ({ page }) => {
