@@ -9,16 +9,26 @@ import app/web.{type Context, Context, bids_cookie, uid_cookie}
 import gleam/http.{Http}
 import gleam/http/cookie
 import gleam/http/response
+import gleam/io
 import gleam/json
 import gleam/list
 import gleam/option
 import gleam/result
 import gleam/string
 import lustre/element
+import valid
 import wisp.{type Request}
 
 pub fn post_create_user(req: Request, ctx: Context) {
   use form <- wisp.require_form(req)
+
+  let email_validator = valid.string_is_email("Not email")
+  let password_validator =
+    valid.string_is_not_empty("password must not be empty")
+    |> valid.then(valid.string_min_length(
+      8,
+      "password must more than 8 charactor",
+    ))
 
   let result = {
     use user_email <- result.try(
@@ -26,9 +36,25 @@ pub fn post_create_user(req: Request, ctx: Context) {
       |> result.map_error(fn(_) { error.BadRequest }),
     )
 
+    use _valid <- result.try(
+      email_validator(user_email)
+      |> result.map_error(fn(err) {
+        io.debug(err)
+        error.BadRequest
+      }),
+    )
+
     use user_password <- result.try(
       list.key_find(form.values, "password")
       |> result.map_error(fn(_) { error.BadRequest }),
+    )
+
+    use _valid <- result.try(
+      password_validator(user_password)
+      |> result.map_error(fn(err) {
+        io.debug(err)
+        error.BadRequest
+      }),
     )
 
     use user_id <- result.try(
@@ -68,15 +94,39 @@ pub fn post_create_user(req: Request, ctx: Context) {
 pub fn post_signin_user(req: Request, ctx: Context) {
   use form <- wisp.require_form(req)
 
+  let email_validator = valid.string_is_email("Not email")
+  let password_validator =
+    valid.string_is_not_empty("password must not be empty")
+    |> valid.then(valid.string_min_length(
+      8,
+      "password must more than 8 charactor",
+    ))
+
   let result = {
     use user_email <- result.try(
       list.key_find(form.values, "email")
       |> result.map_error(fn(_) { error.BadRequest }),
     )
 
+    use _valid <- result.try(
+      email_validator(user_email)
+      |> result.map_error(fn(err) {
+        io.debug(err)
+        error.BadRequest
+      }),
+    )
+
     use user_password <- result.try(
       list.key_find(form.values, "password")
       |> result.map_error(fn(_) { error.BadRequest }),
+    )
+
+    use _valid <- result.try(
+      password_validator(user_password)
+      |> result.map_error(fn(err) {
+        io.debug(err)
+        error.BadRequest
+      }),
     )
 
     use user <- result.try(
