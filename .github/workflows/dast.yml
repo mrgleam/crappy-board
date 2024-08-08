@@ -55,13 +55,13 @@ jobs:
         target: 'http://localhost:8000'
         allow_issue_writing: false
         cmd_options: |
-          '-a -j -d --hook=/zap/auth_hook.py -z "auth.loginurl=http://localhost:8000/signin
-          auth.auto
-          auth.username='aaa@aaa.com'
-          auth.password='aaaaaaaa'
-          auth.username_field="email"
-          auth.password_field="password"
-          auth.auto=1
-          auth.submit_field="submit"
+          '-a -j -d --hook=/zap/auth_hook.py -z "auth.loginurl=http://localhost:8000/signin \
+          auth.auto \
+          auth.username='aaa@aaa.com' \
+          auth.password='aaaaaaaa' \
+          auth.username_field="email" \
+          auth.password_field="password" \
+          auth.auto=1 \
+          auth.submit_field="submit" \
           auth.exclude='.*signout.*'
           "'
