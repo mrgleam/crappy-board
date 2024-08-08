@@ -55,7 +55,7 @@ jobs:
         target: 'http://localhost:8000'
         allow_issue_writing: false
         cmd_options: |
-          '-a --hook=/zap/auth_hook.py -z "auth.loginurl=http://localhost:8000/signin
+          '-a -j -d --hook=/zap/auth_hook.py -z "auth.loginurl=http://localhost:8000/signin
           auth.auto
           auth.username='aaa@aaa.com'
           auth.password='aaaaaaaa'
