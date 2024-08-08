@@ -22,6 +22,8 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
     }
     ["boards", board_id] -> {
       use ctx <- web.authenticate(req, ctx)
+      use ctx <- web.authorized(req, ctx)
+      use <- web.guard(ctx, board_id)
       home(board_id, ctx)
     }
     ["signup"] -> signup(req, ctx)
@@ -32,26 +34,36 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
     }
     ["boards", board_id, "items", "create"] -> {
       use ctx <- web.authenticate(req, ctx)
+      use ctx <- web.authorized(req, ctx)
+      use <- web.guard(ctx, board_id)
       use <- wisp.require_method(req, http.Post)
       item_routes.post_create_item(req, ctx, board_id)
     }
     ["boards", board_id, "items", item_id] -> {
       use ctx <- web.authenticate(req, ctx)
+      use ctx <- web.authorized(req, ctx)
+      use <- web.guard(ctx, board_id)
       use <- wisp.require_method(req, http.Delete)
       item_routes.post_delete_item(ctx, board_id, item_id)
     }
     ["boards", board_id, "items", item_id, "todo"] -> {
       use ctx <- web.authenticate(req, ctx)
+      use ctx <- web.authorized(req, ctx)
+      use <- web.guard(ctx, board_id)
       use <- wisp.require_method(req, http.Patch)
       item_routes.patch_todo(ctx, board_id, item_id)
     }
     ["boards", board_id, "items", item_id, "doing"] -> {
       use ctx <- web.authenticate(req, ctx)
+      use ctx <- web.authorized(req, ctx)
+      use <- web.guard(ctx, board_id)
       use <- wisp.require_method(req, http.Patch)
       item_routes.patch_doing(ctx, board_id, item_id)
     }
     ["boards", board_id, "items", item_id, "done"] -> {
       use ctx <- web.authenticate(req, ctx)
+      use ctx <- web.authorized(req, ctx)
+      use <- web.guard(ctx, board_id)
       use <- wisp.require_method(req, http.Patch)
       item_routes.patch_done(ctx, board_id, item_id)
     }

@@ -36,7 +36,13 @@ pub fn main() {
       ),
     )
 
-  let ctx = Context(static_directory: static_directory(), db: db, user_id: "")
+  let ctx =
+    Context(
+      static_directory: static_directory(),
+      db: db,
+      user_id: "",
+      board_ids: [],
+    )
 
   let handler = router.handle_request(_, ctx)
 

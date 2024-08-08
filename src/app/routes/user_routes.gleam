@@ -5,10 +5,11 @@ import app/models/board_user.{create_board_user, list_board_user}
 import app/models/user.{create_user, signin_user}
 import app/pages
 import app/pages/layout.{layout}
-import app/web.{type Context, Context, uid_cookie}
+import app/web.{type Context, Context, bids_cookie, uid_cookie}
 import gleam/http.{Http}
 import gleam/http/cookie
 import gleam/http/response
+import gleam/json
 import gleam/list
 import gleam/option
 import gleam/result
@@ -88,7 +89,13 @@ pub fn post_signin_user(req: Request, ctx: Context) {
   }
   case result {
     Ok(user_id) -> {
-      list_board_user(user_id, ctx.db)
+      let boards = list_board_user(user_id, ctx.db)
+      let board_ids =
+        list.map(boards, fn(board) {
+          board.id |> uuid.cast |> fn(x) { result.unwrap(x, "") }
+        })
+
+      boards
       |> board.first
       |> board.get_string_id
       |> list.wrap
@@ -96,6 +103,13 @@ pub fn post_signin_user(req: Request, ctx: Context) {
       |> string.join("/")
       |> wisp.redirect
       |> wisp.set_cookie(req, uid_cookie, user_id, wisp.Signed, 60 * 60)
+      |> wisp.set_cookie(
+        req,
+        bids_cookie,
+        json.to_string(json.array(board_ids, json.string)),
+        wisp.Signed,
+        60 * 60,
+      )
     }
     Error(_) -> {
       [pages.signin("The email or password you entered is incorrect")]
