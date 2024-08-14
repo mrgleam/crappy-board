@@ -3,8 +3,14 @@
 /build
 erl_crash.dump
 
+.vscode
+.metals
+.bsp
+
 *.swp
 /postgres
 .env
 
 e2e/playwright
+
+infra/.scala-build
