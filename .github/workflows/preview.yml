@@ -43,7 +43,7 @@ jobs:
           sbt clean compile
 
       - name: Install Pulumi CLI
-        uses: pulumi/actions-install-pulumi-cli@v3
+        uses: pulumi/actions@v5
 
       - name: Configure Pulumi
         env:
