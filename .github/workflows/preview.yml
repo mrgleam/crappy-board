@@ -8,20 +8,45 @@ on:
       - completed
 
 jobs:
-  preview:
-    name: Preview
+  setup-and-preview:
+    name: Setup & Preview 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: VirtusLab/scala-cli-setup@v1.1.0
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java 17 (for Scala 3)
+        uses: actions/setup-java@v3
         with:
-          jvm: graalvm-java11:22.3.3
-          apps: sbt
-      - run: sbt update
-        working-directory: infra
-      - uses: pulumi/actions@v3
+          distribution: 'temurin' # Install the Eclipse Temurin distribution
+          java-version: '17' # Scala 3 is compatible with Java 17
+
+      - name: Cache sbt dependencies
+        uses: actions/cache@v3
         with:
-          command: preview
-          stack-name: dev/crappy-board
+          path: |
+            ~/.ivy2/cache
+            ~/.sbt
+            ~/.coursier
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+          restore-keys: |
+            ${{ runner.os }}-sbt-
+
+      - name: Install sbt
+        run: |
+          echo "Installing sbt..."
+          sudo apt-get install sbt
+
+      - name: Compile Scala code
+        run: |
+          echo "Compiling Scala code..."
+          sbt clean compile
+
+      - name: Install Pulumi CLI
+        uses: pulumi/actions-install-pulumi-cli@v3
+
+      - name: Configure Pulumi
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+        run: |
+          pulumi login
