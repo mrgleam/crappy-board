@@ -1,4 +1,4 @@
-name: Pulumi
+name: Deploy
 
 # Only trigger, when the build workflow succeeded
 on:
@@ -22,6 +22,6 @@ jobs:
       - uses: pulumi/actions@v3
         with:
           command: preview
-          stack-name: crappy-board-dev
+          stack-name: dev/crappy-board
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
