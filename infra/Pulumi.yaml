@@ -1,0 +1,5 @@
+name: crappy-board
+runtime: scala
+description: A Crappy Board written in Gleam
+config:
+    pulumi:disable-default-providers: ["kubernetes"]

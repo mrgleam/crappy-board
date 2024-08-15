@@ -1,0 +1,27 @@
+name: Pulumi
+
+# Only trigger, when the build workflow succeeded
+on:
+  workflow_run:
+    workflows: ["E2E Tests"]
+    types:
+      - completed
+
+jobs:
+  preview:
+    name: Preview
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: VirtusLab/scala-cli-setup@v1.1.0
+        with:
+          jvm: graalvm-java11:22.3.3
+          apps: sbt
+      - run: sbt update
+        working-directory: infra
+      - uses: pulumi/actions@v3
+        with:
+          command: preview
+          stack-name: crappy-board-dev
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
