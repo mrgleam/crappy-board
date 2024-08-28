@@ -33,7 +33,7 @@ jobs:
           jvm: corretto:21
 
       - name: Pulumi Preview
-        uses: pulumi/actions@v5
+        uses: pulumi/actions@v4
         with:
           command: preview
           stack-name: planktonsoft/crappy-board-prod
