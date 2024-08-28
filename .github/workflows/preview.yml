@@ -3,7 +3,7 @@ name: Deploy
 # Only trigger, when the build workflow succeeded
 on:
   workflow_run:
-    workflows: ["E2E Tests"]
+    workflows: ["E2E Tests", "Unit Tests"]
     types:
       - completed
 
@@ -17,6 +17,9 @@ jobs:
       AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
       AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infra
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -52,15 +55,9 @@ jobs:
           echo "Compiling Scala code..."
           sbt clean compile
 
-      - name: Install Pulumi CLI
-        uses: pulumi/actions@v5
-
-      - name: Configure Pulumi
-        run: |
-          pulumi login
-
-      - name: Select Pulumi stack
-        run: pulumi stack select planktonsoft/crappy-board/prod
-  
       - name: Pulumi Preview
-        run: pulumi preview
+        uses: pulumi/actions@v5
+        with:
+          command: preview
+          stack-name: planktonsoft/crappy-board/prod
+          work-dir: infra
