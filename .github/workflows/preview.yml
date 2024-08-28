@@ -60,7 +60,7 @@ jobs:
           pulumi login
 
       - name: Select Pulumi stack
-        run: pulumi stack select crappy-board/prod
+        run: pulumi stack select prod
   
       - name: Pulumi Preview
         run: pulumi preview
