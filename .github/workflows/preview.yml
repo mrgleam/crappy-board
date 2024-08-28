@@ -36,5 +36,5 @@ jobs:
         uses: pulumi/actions@v5
         with:
           command: preview
-          stack-name: planktonsoft/crappy-board/prod
+          stack-name: planktonsoft/crappy-board-prod
           work-dir: infra
