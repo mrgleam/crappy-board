@@ -29,9 +29,17 @@ jobs:
         with:
           jvm: corretto:21
 
+      - name: Install Pulumi CLI
+        uses: pulumi/actions@v5
+
+      - name: Configure Pulumi
+        run: pulumi login
+
+      - name: Configure Pulumi Plugins
+        run: pulumi plugin install language scala 0.3.2 --server github://api.github.com/VirtusLab/besom
+
+      - name: Select Pulumi stack
+        run: pulumi stack select planktonsoft/crappy-board-prod
+  
       - name: Pulumi Preview
-        uses: pulumi/actions@v4
-        with:
-          command: preview
-          stack-name: planktonsoft/crappy-board-prod
-          work-dir: infra
+        run: pulumi preview
