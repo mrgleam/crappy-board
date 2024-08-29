@@ -3,7 +3,7 @@ name: Deploy
 # Only trigger, when the build workflow succeeded
 on:
   workflow_run:
-    workflows: ["E2E Tests"]
+    workflows: ["Deploy Images to GHCR"]
     types:
       - completed
 
