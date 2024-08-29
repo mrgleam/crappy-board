@@ -9,6 +9,7 @@ on:
 
 jobs:
   setup-and-preview:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Setup & Preview 
     env:
       PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}

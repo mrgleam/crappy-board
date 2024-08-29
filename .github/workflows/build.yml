@@ -9,6 +9,7 @@ on:
 
 jobs:
   push-store-image:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout GitHub Action'
@@ -21,7 +22,7 @@ jobs:
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
 
-      - name: 'Build Inventory Image'
+      - name: 'Build Image'
         run: |
           docker build . --tag ghcr.io/mrgleam/crappy-board:latest
           docker push ghcr.io/mrgleam/crappy-board:latest
