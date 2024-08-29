@@ -8,4 +8,4 @@ install-tailwind-cli:
 e2e-test:
 	cd e2e && yarn start
 docker-build:
-	docker build -t crappy-board:latest .
+	cd build && gleam export erlang-shipment && cd .. && docker build -t crappy-board:latest .

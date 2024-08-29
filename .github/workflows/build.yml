@@ -23,6 +23,7 @@ jobs:
           rebar3-version: "3"
       - run: gleam deps download
       - run: gleam build
+      - run: cd build && gleam export erlang-shipment
 
       - name: 'Login to GitHub Container Registry'
         uses: docker/login-action@v1
