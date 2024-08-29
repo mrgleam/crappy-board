@@ -4,7 +4,7 @@ FROM ghcr.io/gleam-lang/gleam:v1.4.1-erlang-alpine
 COPY . /build/
 
 # Compile the project
-RUN mv /build/erlang-shipment /app \
+RUN mv build/erlang-shipment /app \
 && addgroup -S crappy \
 && adduser -S crappy -G crappy \
 && chown -R crappy /app
