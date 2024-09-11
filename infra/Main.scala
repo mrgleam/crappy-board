@@ -7,6 +7,8 @@ import hcloud.inputs._
 
   val sshPublicKey  = config.requireString("ssh_public_key")
 
+  val sshPrivateKey  = config.requireString("ssh_private_key")
+
   val hcloudProvider = hcloud.Provider(
     "hcloud",
     hcloud.ProviderArgs(
@@ -48,8 +50,33 @@ import hcloud.inputs._
 
   val nodeIps = serverPool.map(_.ipv4Address).parSequence
 
-  Stack(spawnNodes).exports(
+  val clusterName = "crappy-board-prod"
+
+  val ghcrToken = config.requireString("github_docker_token").flatMap(_.toNonEmptyOutput)
+
+  val k3s = K3S(
+    clusterName,
+    K3SArgs(
+      clusterName = clusterName,
+      serverIps = serverPool.map(_.ipv4Address),
+      privateKey = sshPrivateKey,
+      k3sVersion = "v1.31.0+k3s1",
+      registryAuth = AuthArgs("ghcr.io", "mrgleam", ghcrToken)
+    ),
+    ComponentResourceOptions(
+      deletedWith = serverPool.headOption.getOrElse(None)
+    )
+  )
+
+  val writeKubeconfig = k3s.flatMap { k3s =>
+    k3s.kubeconfig.map { kubeconfig =>
+      os.write.over(os.pwd / "kubeconfig.conf", kubeconfig)
+    }
+  }
+
+  Stack(spawnNodes, writeKubeconfig, k3s).exports(
     nodes = nodeIps,
+    kubeconfigPath = (os.pwd / "kubeconfig.conf").toString,
   )
   
 }
