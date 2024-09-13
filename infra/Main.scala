@@ -2,6 +2,7 @@ import besom.*
 import besom.api.hcloud
 import hcloud.inputs.*
 import besom.api.{kubernetes => k8s}
+import besom.api.{cloudflare => cf}
 
 @main def main: Unit = Pulumi.run {
   val locations = Vector("fsn1", "nbg1", "hel1")
@@ -93,7 +94,7 @@ import besom.api.{kubernetes => k8s}
         replicas = 1,
         containerPort = 8000,
         servicePort = 8000,
-        host = "planktonsoft.com",
+        host = "demo.planktonsoft.com",
         secretKeyBase
       )
     ),
@@ -103,7 +104,30 @@ import besom.api.{kubernetes => k8s}
     )
   )
 
-  Stack(spawnNodes, writeKubeconfig, k3s, app).exports(
+  val cfProvider = cf.Provider(
+    "cloudflare-provider",
+    cf.ProviderArgs(
+      apiToken = config.requireString("cloudflare_token")
+    )
+  )
+
+  val aRecords = serverPool.zipWithIndex.map { case (server, idx) =>
+    val recordIdx = idx + 1
+    cf.Record(
+      s"crappy-board-a-record-$recordIdx",
+      cf.RecordArgs(
+        name = "demo.planktonsoft.com",
+        `type` = "A",
+        value = server.ipv4Address,
+        zoneId = config.requireString("cloudflare_zone_id"),
+        ttl = 1,
+        proxied = true
+      ),
+      opts(provider = cfProvider)
+    )
+  }.parSequence
+
+  Stack(spawnNodes, writeKubeconfig, k3s, app, aRecords).exports(
     nodes = nodeIps,
     kubeconfigPath = (os.pwd / "kubeconfig.conf").toString,
     url = app.flatMap(_.appUrl)

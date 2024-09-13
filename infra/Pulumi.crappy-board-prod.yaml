@@ -1,5 +1,9 @@
 encryptionsalt: v1:nyAyAY3vQ/0=:v1:8BYEazTyc+8fQkVi:/fgtJaZX+OW6EN+12kNmWIyMHKqC3w==
 config:
+  crappy-board:cloudflare_token:
+    secure: v1:0uIPBYCLnrqW9TMU:k9+UGOVkVEGHwIyxSx5V07XnbQC1NT00HIstbusEPjZNWqnrbGm91RCFpyfF6nImwzvTFV1prjE=
+  crappy-board:cloudflare_zone_id:
+    secure: v1:MM0Nn3XvORpM9Fis:FiGbvE249oNctA/EBd5RN5+lVUObIWMKpuSX7/eeZN9CcUu43NFRsXEK6TBJTAzb
   crappy-board:github_docker_token:
     secure: v1:zLcD1+iRv8Lxr+qb:zJT6evxyNrx1FsW7jNK6Kpzo+gn9oWpYvaWvc4k4KXSQEehFPOtJp/dVKeLSrdpGicquncJ19qg=
   crappy-board:hcloud_token:
