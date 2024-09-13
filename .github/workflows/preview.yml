@@ -7,6 +7,10 @@ on:
     types:
       - completed
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   setup-and-preview:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
