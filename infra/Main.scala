@@ -1,6 +1,7 @@
-import besom._
+import besom.*
 import besom.api.hcloud
-import hcloud.inputs._
+import hcloud.inputs.*
+import besom.api.{kubernetes => k8s}
 
 @main def main: Unit = Pulumi.run {
   val locations = Vector("fsn1", "nbg1", "hel1")
@@ -50,7 +51,7 @@ import hcloud.inputs._
 
   val nodeIps = serverPool.map(_.ipv4Address).parSequence
 
-  val clusterName = "crappy-board-prod"
+  val clusterName = "crappy-board"
 
   val ghcrToken = config.requireString("github_docker_token").flatMap(_.toNonEmptyOutput)
 
@@ -74,9 +75,34 @@ import hcloud.inputs._
     }
   }
 
-  Stack(spawnNodes, writeKubeconfig, k3s).exports(
+  val k3sProvider = k8s.Provider(
+    "k8s",
+    k8s.ProviderArgs(
+      kubeconfig = k3s.flatMap(_.kubeconfig)
+    )
+  )
+
+  val app = AppDeployment(
+    "crappy-board",
+    AppDeploymentArgs(
+      PostgresArgs(port = 5432),
+      AppArgs(
+        name = "crappy-board",
+        replicas = 1,
+        containerPort = 8000,
+        servicePort = 8000,
+        host = "planktonsoft.com",
+      )
+    ),
+    ComponentResourceOptions(
+      providers = k3sProvider,
+      deletedWith = k3s
+    )
+  )
+
+  Stack(spawnNodes, writeKubeconfig, k3s, app).exports(
     nodes = nodeIps,
     kubeconfigPath = (os.pwd / "kubeconfig.conf").toString,
+    url = app.flatMap(_.appUrl)
   )
-  
 }
