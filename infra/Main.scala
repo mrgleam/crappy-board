@@ -82,6 +82,8 @@ import besom.api.{kubernetes => k8s}
     )
   )
 
+  val secretKeyBase = config.requireString("secret_key_base").flatMap(_.toNonEmptyOutput)
+
   val app = AppDeployment(
     "crappy-board",
     AppDeploymentArgs(
@@ -92,6 +94,7 @@ import besom.api.{kubernetes => k8s}
         containerPort = 8000,
         servicePort = 8000,
         host = "planktonsoft.com",
+        secretKeyBase
       )
     ),
     ComponentResourceOptions(

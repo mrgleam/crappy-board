@@ -26,7 +26,8 @@ case class AppArgs private (
   replicas: Output[Int],
   containerPort: Output[Int],
   servicePort: Output[Int],
-  host: Output[NonEmptyString]
+  host: Output[NonEmptyString],
+  secretKeyBase: Output[NonEmptyString]
 )
 object AppArgs:
   def apply(
@@ -34,14 +35,16 @@ object AppArgs:
     replicas: Input[Int],
     containerPort: Input[Int],
     servicePort: Input[Int],
-    host: Input[NonEmptyString]
+    host: Input[NonEmptyString],
+    secretKeyBase: Input[NonEmptyString]
   )(using Context): AppArgs =
     new AppArgs(
       name.asOutput(),
       replicas.asOutput(),
       containerPort.asOutput(),
       servicePort.asOutput(),
-      host.asOutput()
+      host.asOutput(),
+      secretKeyBase.asOutput()
     )
 
 case class PostgresArgs private (
