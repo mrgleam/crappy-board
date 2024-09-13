@@ -76,6 +76,7 @@ object AppDeployment:
       val containerPort = args.appArgs.containerPort
       val servicePort = args.appArgs.servicePort
       val ingressHost = args.appArgs.host
+      val appReplicas = args.appArgs.replicas
 
       val postgresOperatorChart = Chart(
         "postgres-operator",
@@ -136,7 +137,7 @@ object AppDeployment:
           DeploymentArgs(
             spec = DeploymentSpecArgs(
               selector = LabelSelectorArgs(matchLabels = labels),
-              replicas = 1,
+              replicas = appReplicas,
               template = PodTemplateSpecArgs(
                 metadata = ObjectMetaArgs(
                   name = p"$name-deployment",
