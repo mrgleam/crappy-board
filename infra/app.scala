@@ -71,6 +71,8 @@ object AppDeployment:
 
       val appNamespace = Namespace(name)
 
+      val postgresPort = args.postgresArgs.port
+
       val containerPort = args.appArgs.containerPort
       val servicePort = args.appArgs.servicePort
       val ingressHost = args.appArgs.host
@@ -101,6 +103,7 @@ object AppDeployment:
                 |      databases:
                 |        - crappy
                 |  postgresVersion: 16
+                |  port: ${postgresPort}
                 |  instances:
                 |  - name: "pgha1"
                 |    replicas: 2
