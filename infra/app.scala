@@ -77,6 +77,7 @@ object AppDeployment:
       val servicePort = args.appArgs.servicePort
       val ingressHost = args.appArgs.host
       val appReplicas = args.appArgs.replicas
+      val appSecretKey = args.appArgs.secretKeyBase
 
       val postgresOperatorChart = Chart(
         "postgres-operator",
@@ -149,7 +150,7 @@ object AppDeployment:
                     name = "app",
                     image = "ghcr.io/mrgleam/crappy-board:latest",
                     env = List(
-                      EnvVarArgs(name = "SECRET_KEY_BASE", value = "test-secret-key"),
+                      EnvVarArgs(name = "SECRET_KEY_BASE", value = appSecretKey),
                       EnvVarArgs(
                         name = "PG_USER",
                         valueFrom = EnvVarSourceArgs(
