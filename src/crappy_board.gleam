@@ -7,13 +7,17 @@ import gleam/int
 import gleam/option.{Some}
 import gleam/pgo
 import mist
+import radish
 import wisp
 
 pub fn main() {
   wisp.configure_logger()
 
   dot_env.load()
+  let assert Ok(base_url) = env.get("BASE_URL")
+  let assert Ok(email_api_key) = env.get("EMAIL_API_KEY")
   let assert Ok(secret_key_base) = env.get("SECRET_KEY_BASE")
+  let assert Ok(redis_host) = env.get("REDIS_HOST")
   let assert Ok(pg_host) = env.get("PG_HOST")
   let assert Ok(pg_port_string) = env.get("PG_PORT")
   let assert Ok(pa_port) = int.parse(pg_port_string)
@@ -36,10 +40,15 @@ pub fn main() {
       ),
     )
 
+  let assert Ok(redis) = radish.start(redis_host, 6379, [radish.Timeout(128)])
+
   let ctx =
     Context(
       static_directory: static_directory(),
+      base_url: base_url,
       db: db,
+      redis: redis,
+      email_api_key: email_api_key,
       user_id: "",
       board_ids: [],
     )

@@ -32,6 +32,10 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
       use <- wisp.require_method(req, http.Post)
       user_routes.post_sign_out()
     }
+    ["users", user_id, "activate"] -> {
+      use <- wisp.require_method(req, http.Get)
+      user_routes.activate_user(req, ctx, user_id)
+    }
     ["boards", board_id, "items", "create"] -> {
       use ctx <- web.authenticate(req, ctx)
       use ctx <- web.authorized(req, ctx)

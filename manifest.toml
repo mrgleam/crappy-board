@@ -13,7 +13,7 @@ packages = [
   { name = "gleam_crypto", version = "1.3.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_crypto", source = "hex", outer_checksum = "ADD058DEDE8F0341F1ADE3AAC492A224F15700829D9A3A3F9ADF370F875C51B7" },
   { name = "gleam_erlang", version = "0.25.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_erlang", source = "hex", outer_checksum = "054D571A7092D2A9727B3E5D183B7507DAB0DA41556EC9133606F09C15497373" },
   { name = "gleam_http", version = "3.6.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_http", source = "hex", outer_checksum = "8C07DF9DF8CC7F054C650839A51C30A7D3C26482AC241C899C1CEA86B22DBE51" },
-  { name = "gleam_httpc", version = "2.2.0", build_tools = ["gleam"], requirements = ["gleam_http", "gleam_stdlib"], otp_app = "gleam_httpc", source = "hex", outer_checksum = "CF76C71002DEECF6DC5D9CA83D962728FAE166B57926BE442D827004D3C7DF1B" },
+  { name = "gleam_httpc", version = "2.3.0", build_tools = ["gleam"], requirements = ["gleam_http", "gleam_stdlib"], otp_app = "gleam_httpc", source = "hex", outer_checksum = "CF6CDD88830CC9853F7638ECC0BE7D7CD9522640DA5FAB4C08CFAC8DEBD08028" },
   { name = "gleam_json", version = "1.0.1", build_tools = ["gleam"], requirements = ["gleam_stdlib", "thoas"], otp_app = "gleam_json", source = "hex", outer_checksum = "9063D14D25406326C0255BDA0021541E797D8A7A12573D849462CAFED459F6EB" },
   { name = "gleam_otp", version = "0.10.0", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_stdlib"], otp_app = "gleam_otp", source = "hex", outer_checksum = "0B04FE915ACECE539B317F9652CAADBBC0F000184D586AAAF2D94C100945D72B" },
   { name = "gleam_pgo", version = "0.13.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "pgo"], otp_app = "gleam_pgo", source = "hex", outer_checksum = "6A1E7F3E717C077788254871E4EF4A8DFF58FEC07D7FA7C7702C2CCF66095AC8" },
@@ -25,20 +25,24 @@ packages = [
   { name = "logging", version = "1.3.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "logging", source = "hex", outer_checksum = "1098FBF10B54B44C2C7FDF0B01C1253CAFACDACABEFB4B0D027803246753E06D" },
   { name = "lustre", version = "4.3.2", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_json", "gleam_otp", "gleam_stdlib"], otp_app = "lustre", source = "hex", outer_checksum = "7F4CE2DB524A882F97C94AA3D320986B6CAC415146D5F98DE4782E1B0B59098F" },
   { name = "marceau", version = "1.2.0", build_tools = ["gleam"], requirements = [], otp_app = "marceau", source = "hex", outer_checksum = "5188D643C181EE350D8A20A3BDBD63AF7B6C505DE333CFBE05EF642ADD88A59B" },
+  { name = "minigen", version = "0.1.1", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "minigen", source = "hex", outer_checksum = "AFD1E637A7F429C2C57438FB635CCCAD818AA9C39D6F6E1A5200E5952940E2FD" },
   { name = "mist", version = "1.2.0", build_tools = ["gleam"], requirements = ["birl", "gleam_erlang", "gleam_http", "gleam_otp", "gleam_stdlib", "glisten", "gramps", "hpack_erl", "logging"], otp_app = "mist", source = "hex", outer_checksum = "109B4D64E68C104CC23BB3CC5441ECD479DD7444889DA01113B75C6AF0F0E17B" },
-  { name = "non_empty_list", version = "2.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "non_empty_list", source = "hex", outer_checksum = "3942EE4867190E63BED988779F0B2DA10E7B2A100E253A13192A9E18DCACC6EC" },
+  { name = "mug", version = "1.1.1", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_stdlib"], otp_app = "mug", source = "hex", outer_checksum = "C381913DB8389BBAABA856826CB858D1C7F63673E4932FC9499958395FA6B2E9" },
+  { name = "non_empty_list", version = "2.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "non_empty_list", source = "hex", outer_checksum = "3BF1496B475F3F2CE2EA18157587329812493369B2A7C5B9DCFEA5C007670A3B" },
   { name = "opentelemetry_api", version = "1.3.0", build_tools = ["rebar3", "mix"], requirements = ["opentelemetry_semantic_conventions"], otp_app = "opentelemetry_api", source = "hex", outer_checksum = "B9E5FF775FD064FA098DBA3C398490B77649A352B40B0B730A6B7DC0BDD68858" },
   { name = "opentelemetry_semantic_conventions", version = "0.2.0", build_tools = ["rebar3", "mix"], requirements = [], otp_app = "opentelemetry_semantic_conventions", source = "hex", outer_checksum = "D61FA1F5639EE8668D74B527E6806E0503EFC55A42DB7B5F39939D84C07D6895" },
   { name = "pg_types", version = "0.4.0", build_tools = ["rebar3"], requirements = [], otp_app = "pg_types", source = "hex", outer_checksum = "B02EFA785CAECECF9702C681C80A9CA12A39F9161A846CE17B01FB20AEEED7EB" },
   { name = "pgo", version = "0.14.0", build_tools = ["rebar3"], requirements = ["backoff", "opentelemetry_api", "pg_types"], otp_app = "pgo", source = "hex", outer_checksum = "71016C22599936E042DC0012EE4589D24C71427D266292F775EBF201D97DF9C9" },
   { name = "poolboy", version = "1.5.2", build_tools = ["rebar3"], requirements = [], otp_app = "poolboy", source = "hex", outer_checksum = "DAD79704CE5440F3D5A3681C8590B9DC25D1A561E8F5A9C995281012860901E3" },
+  { name = "radish", version = "0.15.0", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_otp", "gleam_stdlib", "mug"], otp_app = "radish", source = "hex", outer_checksum = "57A18EAFA32D792669823F5C8B7514FDFBF143A2ACF514EE3BD6D54DCC893D1B" },
   { name = "ranger", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "ranger", source = "hex", outer_checksum = "1566C272B1D141B3BBA38B25CB761EF56E312E79EC0E2DFD4D3C19FB0CC1F98C" },
   { name = "shellout", version = "1.6.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "shellout", source = "hex", outer_checksum = "E2FCD18957F0E9F67E1F497FC9FF57393392F8A9BAEAEA4779541DE7A68DD7E0" },
   { name = "simplifile", version = "1.7.0", build_tools = ["gleam"], requirements = ["filepath", "gleam_stdlib"], otp_app = "simplifile", source = "hex", outer_checksum = "1D5DFA3A2F9319EC85825F6ED88B8E449F381B0D55A62F5E61424E748E7DDEB0" },
   { name = "thoas", version = "1.2.1", build_tools = ["rebar3"], requirements = [], otp_app = "thoas", source = "hex", outer_checksum = "E38697EDFFD6E91BD12CEA41B155115282630075C2A727E7A6B2947F5408B86A" },
   { name = "tom", version = "0.3.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "tom", source = "hex", outer_checksum = "0831C73E45405A2153091226BF98FB485ED16376988602CC01A5FD086B82D577" },
-  { name = "valid", version = "4.1.2", build_tools = ["gleam"], requirements = ["gleam_stdlib", "non_empty_list"], otp_app = "valid", source = "hex", outer_checksum = "D6A4193F0BD667C35CA0557DFF5CF72944EBFB0AF2678EE3142E4A0E7A664037" },
+  { name = "valid", version = "4.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "non_empty_list"], otp_app = "valid", source = "hex", outer_checksum = "AFCF785EF15030EBC258EEB36551D3185EAA4B20DCBAA9CB398594335CEFAEAD" },
   { name = "wisp", version = "0.14.0", build_tools = ["gleam"], requirements = ["exception", "gleam_crypto", "gleam_erlang", "gleam_http", "gleam_json", "gleam_stdlib", "logging", "marceau", "mist", "simplifile"], otp_app = "wisp", source = "hex", outer_checksum = "9F5453AF1F9275E6F8707BC815D6A6A9DF41551921B16FBDBA52883773BAE684" },
+  { name = "zeptomail", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_http", "gleam_json", "gleam_stdlib"], otp_app = "zeptomail", source = "hex", outer_checksum = "8A90F7FB50324509B3F7E4F08A9C667823A2AEACE797F6050EA87B491B8948E6" },
 ]
 
 [requirements]
@@ -47,11 +51,15 @@ dot_env = { version = ">= 0.5.1 and < 1.0.0" }
 glailglind = { version = ">= 1.1.1 and < 2.0.0" }
 gleam_erlang = { version = ">= 0.25.0 and < 1.0.0" }
 gleam_http = { version = ">= 3.6.0 and < 4.0.0" }
+gleam_httpc = { version = ">= 2.3.0 and < 3.0.0" }
 gleam_json = { version = ">= 1.0.1 and < 2.0.0" }
 gleam_pgo = { version = ">= 0.10.0 and < 1.0.0" }
 gleam_stdlib = { version = ">= 0.39.0 and < 2.0.0" }
 gleeunit = { version = ">= 1.0.0 and < 2.0.0" }
 lustre = { version = ">= 4.1.8 and < 5.0.0" }
+minigen = { version = ">= 0.1.1 and < 1.0.0" }
 mist = { version = ">= 1.2.0 and < 2.0.0" }
-valid = { version = ">= 4.1.2 and < 5.0.0" }
+radish = { version = ">= 0.15.0 and < 1.0.0" }
+valid = { version = ">= 4.2.0 and < 5.0.0" }
 wisp = { version = ">= 0.14.0 and < 1.0.0" }
+zeptomail = { version = ">= 1.1.0 and < 2.0.0" }

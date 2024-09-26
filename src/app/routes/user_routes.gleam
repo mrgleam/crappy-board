@@ -2,6 +2,7 @@ import app/error
 import app/helpers/uuid
 import app/models/board.{create_board}
 import app/models/board_user.{create_board_user, list_board_user}
+import app/models/email.{send_verify_user}
 import app/models/user.{create_user, signin_user}
 import app/pages
 import app/pages/layout.{layout}
@@ -16,6 +17,8 @@ import gleam/option
 import gleam/result
 import gleam/string
 import lustre/element
+import minigen
+import radish
 import valid
 import wisp.{type Request}
 
@@ -73,7 +76,23 @@ pub fn post_create_user(req: Request, ctx: Context) {
       |> result.flatten,
     )
 
-    create_board_user(board_id, user_id, ctx.db)
+    use _board <- result.try(
+      create_board_user(board_id, user_id, ctx.db)
+      |> result.map_error(fn(_) { error.BadRequest }),
+    )
+
+    let token = minigen.string(20) |> minigen.run
+
+    use _ <- result.try(
+      radish.set(ctx.redis, user_id, token, 128)
+      |> result.map(fn(_) { radish.expire(ctx.redis, user_id, 60, 128) })
+      |> result.map_error(fn(_) { error.BadRequest }),
+    )
+
+    let confirmation_link =
+      ctx.base_url <> "/users/" <> user_id <> "/activate?token=" <> token
+
+    send_verify_user(ctx.email_api_key, user_email, confirmation_link)
   }
   case result {
     Ok(_) -> {
@@ -175,4 +194,29 @@ pub fn post_sign_out() {
     cookie.Attributes(..cookie.defaults(Http), max_age: option.Some(0))
   wisp.redirect("/")
   |> response.set_cookie(uid_cookie, "", attributes)
+}
+
+pub fn activate_user(req: Request, ctx: Context, user_id: String) {
+  let queries = wisp.get_query(req)
+
+  let activated = {
+    use token <- result.try(
+      list.key_find(queries, "token")
+      |> result.map_error(fn(_) { error.BadRequest }),
+    )
+
+    user.activate_user(user_id, token, ctx.db, ctx.redis)
+  }
+
+  case activated {
+    Ok(_) -> {
+      [pages.signin("")]
+      |> layout
+      |> element.to_document_string_builder
+      |> wisp.html_response(200)
+    }
+    Error(_) -> {
+      wisp.response(403)
+    }
+  }
 }

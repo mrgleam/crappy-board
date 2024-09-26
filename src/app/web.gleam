@@ -1,17 +1,22 @@
 import gleam/bool
 import gleam/dynamic
+import gleam/erlang/process.{type Subject}
 import gleam/json
 import gleam/list
 import gleam/option
 import gleam/pgo.{type Connection}
 import gleam/result
 import gleam/string_builder
+import radish.{type Message}
 import wisp.{type Request, type Response}
 
 pub type Context {
   Context(
     static_directory: String,
+    base_url: String,
     db: Connection,
+    redis: Subject(Message),
+    email_api_key: String,
     user_id: String,
     board_ids: List(String),
   )

@@ -1,4 +1,5 @@
 import gleam/pgo
+import zeptomail.{type ApiError}
 
 pub type AppError {
   NotFound
@@ -8,4 +9,5 @@ pub type AppError {
   UnprocessableEntity
   ContentRequired
   DatabaseError(pgo.QueryError)
+  ApiError(ApiError)
 }
