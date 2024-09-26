@@ -1,3 +1,4 @@
+import app/helpers/constant
 import app/router
 import app/web.{Context}
 import dot_env
@@ -40,7 +41,8 @@ pub fn main() {
       ),
     )
 
-  let assert Ok(redis) = radish.start(redis_host, 6379, [radish.Timeout(128)])
+  let assert Ok(redis) =
+    radish.start(redis_host, 6379, [radish.Timeout(constant.timeout)])
 
   let ctx =
     Context(

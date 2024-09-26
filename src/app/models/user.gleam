@@ -1,4 +1,5 @@
 import app/error.{type AppError}
+import app/helpers/constant
 import beecrypt
 import gleam/dynamic
 import gleam/erlang/process.{type Subject}
@@ -100,7 +101,7 @@ pub fn activate_user(
   redis: Subject(Message),
 ) {
   use token <- result.try(
-    radish.get(redis, user_id, 128)
+    radish.get(redis, user_id, constant.timeout)
     |> result.map_error(fn(_) { error.BadRequest }),
   )
 

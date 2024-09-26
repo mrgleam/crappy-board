@@ -1,4 +1,5 @@
 import app/error
+import app/helpers/constant
 import app/helpers/uuid
 import app/models/board.{create_board}
 import app/models/board_user.{create_board_user, list_board_user}
@@ -84,8 +85,10 @@ pub fn post_create_user(req: Request, ctx: Context) {
     let token = minigen.string(20) |> minigen.run
 
     use _ <- result.try(
-      radish.set(ctx.redis, user_id, token, 128)
-      |> result.map(fn(_) { radish.expire(ctx.redis, user_id, 60, 128) })
+      radish.set(ctx.redis, user_id, token, constant.timeout)
+      |> result.map(fn(_) {
+        radish.expire(ctx.redis, user_id, constant.expired, constant.timeout)
+      })
       |> result.map_error(fn(_) { error.BadRequest }),
     )
 
@@ -171,13 +174,19 @@ pub fn post_signin_user(req: Request, ctx: Context) {
       |> list.prepend("boards")
       |> string.join("/")
       |> wisp.redirect
-      |> wisp.set_cookie(req, uid_cookie, user_id, wisp.Signed, 60 * 60)
+      |> wisp.set_cookie(
+        req,
+        uid_cookie,
+        user_id,
+        wisp.Signed,
+        constant.expired * 60,
+      )
       |> wisp.set_cookie(
         req,
         bids_cookie,
         json.to_string(json.array(board_ids, json.string)),
         wisp.Signed,
-        60 * 60,
+        constant.expired * 60,
       )
     }
     Error(_) -> {
