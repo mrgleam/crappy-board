@@ -49,6 +49,8 @@ jobs:
         otp-version: "26.0.2"
         gleam-version: "1.4.1"
         rebar3-version: "3"
+    - run: gleam deps download
+    - run: gleam build
     - name: "Start Backend"
       env:
         BASE_URL: http://localhost:8000
@@ -61,7 +63,7 @@ jobs:
         PG_DB: crappy_test
       run: |
         gleam run &
-        sleep 45 &&
+        sleep 10 &&
         curl http://localhost:8000 -I
     - uses: actions/setup-node@v4
       with:
