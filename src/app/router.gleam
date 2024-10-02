@@ -32,6 +32,7 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
       use <- wisp.require_method(req, http.Post)
       user_routes.post_sign_out()
     }
+    ["forgot-password"] -> forgot_password(req, ctx)
     ["users", user_id, "activate"] -> {
       use <- wisp.require_method(req, http.Get)
       user_routes.activate_user(req, ctx, user_id)
@@ -115,6 +116,21 @@ fn signin(req: Request, ctx: Context) -> Response {
 
 fn get_signin_form() -> Response {
   [pages.signin("")]
+  |> layout
+  |> element.to_document_string_builder
+  |> wisp.html_response(200)
+}
+
+fn forgot_password(req: Request, ctx: Context) -> Response {
+  case req.method {
+    http.Get -> get_forgot_password_form()
+    http.Post -> user_routes.post_forgot_password(req, ctx)
+    _ -> wisp.method_not_allowed([http.Get, http.Post])
+  }
+}
+
+fn get_forgot_password_form() -> Response {
+  [pages.forgot_password("")]
   |> layout
   |> element.to_document_string_builder
   |> wisp.html_response(200)

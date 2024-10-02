@@ -4,6 +4,7 @@ import beecrypt
 import gleam/dynamic
 import gleam/erlang/process.{type Subject}
 import gleam/io
+import gleam/list
 import gleam/order
 import gleam/pgo.{type Connection}
 import gleam/result
@@ -24,6 +25,35 @@ pub fn user_row_decoder() -> dynamic.Decoder(User) {
     dynamic.element(2, dynamic.string),
     dynamic.element(3, dynamic.bool),
   )
+}
+
+pub fn get_user_by_email(
+  email: String,
+  db: Connection,
+) -> Result(User, AppError) {
+  let sql =
+    "
+      SELECT
+        id,
+        email,
+        password,
+        is_verified
+      FROM
+        users
+      WHERE email = $1
+    "
+
+  use returned <- result.then(
+    pgo.execute(sql, db, [pgo.text(email)], user_row_decoder())
+    |> result.map_error(fn(error) {
+      io.debug(error)
+      case error {
+        _ -> error.BadRequest
+      }
+    }),
+  )
+
+  list.first(returned.rows) |> result.map_error(fn(_) { error.BadRequest })
 }
 
 pub fn create_user(
@@ -64,29 +94,10 @@ pub fn signin_user(
   password: String,
   db: Connection,
 ) -> Result(User, AppError) {
-  let sql =
-    "
-      SELECT
-        id,
-        email,
-        password,
-        is_verified
-      FROM
-        users
-      WHERE email = $1
-    "
-
-  use returned <- result.then(
-    pgo.execute(sql, db, [pgo.text(email)], user_row_decoder())
-    |> result.map_error(fn(error) {
-      io.debug(error)
-      case error {
-        _ -> error.BadRequest
-      }
-    }),
+  use user <- result.try(
+    get_user_by_email(email, db)
+    |> result.map_error(fn(_) { error.BadRequest }),
   )
-
-  let assert [user] = returned.rows
 
   case beecrypt.verify(password, user.password) && user.is_verified {
     True -> Ok(user)

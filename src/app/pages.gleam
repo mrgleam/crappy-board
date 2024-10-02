@@ -1,8 +1,10 @@
 import app/models/item.{type Item}
+import app/pages/forgot_password
 import app/pages/home
 import app/pages/signin
 import app/pages/signup
 import app/pages/signup_success
+import app/pages/submit_forgot_password
 
 pub fn home(board_id: String, items: List(Item)) {
   home.root(board_id, items)
@@ -18,4 +20,12 @@ pub fn signup_success() {
 
 pub fn signin(error: String) {
   signin.root(error)
+}
+
+pub fn forgot_password(error: String) {
+  forgot_password.root(error)
+}
+
+pub fn submit_forgot_password() {
+  submit_forgot_password.root()
 }
