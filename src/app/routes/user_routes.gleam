@@ -3,7 +3,7 @@ import app/helpers/constant
 import app/helpers/uuid
 import app/models/board.{create_board}
 import app/models/board_user.{create_board_user, list_board_user}
-import app/models/email.{send_verify_user}
+import app/models/email.{send_forgot_password, send_verify_user}
 import app/models/user.{create_user, get_user_by_email, signin_user}
 import app/pages
 import app/pages/layout.{layout}
@@ -269,7 +269,7 @@ pub fn post_forgot_password(req: Request, ctx: Context) {
 
     let reset_password_link = ctx.base_url <> "/reset-password?token=" <> token
 
-    send_verify_user(ctx.email_api_key, user_email, reset_password_link)
+    send_forgot_password(ctx.email_api_key, user_email, reset_password_link)
   }
 
   [pages.submit_forgot_password()]
