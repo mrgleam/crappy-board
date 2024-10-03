@@ -87,15 +87,14 @@ pub fn post_create_user(req: Request, ctx: Context) {
     let token = minigen.string(20) |> minigen.run
 
     use _ <- result.try(
-      radish.set(ctx.redis, user_id, token, constant.timeout)
+      radish.set(ctx.redis, token, user_id, constant.timeout)
       |> result.map(fn(_) {
-        radish.expire(ctx.redis, user_id, constant.expired, constant.timeout)
+        radish.expire(ctx.redis, token, constant.expired, constant.timeout)
       })
       |> result.map_error(fn(_) { error.BadRequest }),
     )
 
-    let confirmation_link =
-      ctx.base_url <> "/users/" <> user_id <> "/activate?token=" <> token
+    let confirmation_link = ctx.base_url <> "/activate?token=" <> token
 
     send_verify_user(ctx.email_api_key, user_email, confirmation_link)
   }
@@ -207,7 +206,7 @@ pub fn post_sign_out() {
   |> response.set_cookie(uid_cookie, "", attributes)
 }
 
-pub fn activate_user(req: Request, ctx: Context, user_id: String) {
+pub fn activate_user(req: Request, ctx: Context) {
   let queries = wisp.get_query(req)
 
   let activated = {
@@ -216,15 +215,12 @@ pub fn activate_user(req: Request, ctx: Context, user_id: String) {
       |> result.map_error(fn(_) { error.BadRequest }),
     )
 
-    user.activate_user(user_id, token, ctx.db, ctx.redis)
+    user.activate_user(token, ctx.db, ctx.redis)
   }
 
   case activated {
     Ok(_) -> {
-      [pages.signin("")]
-      |> layout
-      |> element.to_document_string_builder
-      |> wisp.html_response(200)
+      wisp.redirect("/signin")
     }
     Error(_) -> {
       wisp.response(403)

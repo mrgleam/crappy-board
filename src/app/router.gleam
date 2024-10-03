@@ -35,9 +35,9 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
     }
     ["forgot-password"] -> forgot_password(req, ctx)
     ["reset-password"] -> reset_password(req, ctx)
-    ["users", user_id, "activate"] -> {
+    ["activate"] -> {
       use <- wisp.require_method(req, http.Get)
-      user_routes.activate_user(req, ctx, user_id)
+      user_routes.activate_user(req, ctx)
     }
     ["boards", board_id, "items", "create"] -> {
       use ctx <- web.authenticate(req, ctx)

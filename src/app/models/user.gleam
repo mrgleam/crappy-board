@@ -5,10 +5,8 @@ import gleam/dynamic
 import gleam/erlang/process.{type Subject}
 import gleam/io
 import gleam/list
-import gleam/order
 import gleam/pgo.{type Connection}
 import gleam/result
-import gleam/string
 import radish.{type Message}
 
 pub type User {
@@ -130,39 +128,25 @@ pub fn update_password_user(
   Ok(count)
 }
 
-pub fn activate_user(
-  user_id: String,
-  req_token: String,
-  db: Connection,
-  redis: Subject(Message),
-) {
-  use token <- result.try(
-    radish.get(redis, user_id, constant.timeout)
+pub fn activate_user(req_token: String, db: Connection, redis: Subject(Message)) {
+  use user_id <- result.try(
+    radish.get(redis, req_token, constant.timeout)
     |> result.map_error(fn(_) { error.BadRequest }),
   )
 
-  case string.compare(req_token, token) {
-    order.Eq -> {
-      let sql =
-        "
-          UPDATE users SET is_verified = true, updated_at = NOW() WHERE id = $1
-        "
-      use returned <- result.then(
-        pgo.execute(sql, db, [pgo.text(user_id)], dynamic.int)
-        |> result.map_error(fn(error) {
-          io.debug(error)
-          case error {
-            pgo.ConstraintViolated(_, _, _) -> error.ContentRequired
-            _ -> error.BadRequest
-          }
-        }),
-      )
+  let sql =
+    "UPDATE users SET is_verified = true, updated_at = NOW() WHERE id = $1"
+  use returned <- result.then(
+    pgo.execute(sql, db, [pgo.text(user_id)], dynamic.int)
+    |> result.map_error(fn(error) {
+      io.debug(error)
+      case error {
+        pgo.ConstraintViolated(_, _, _) -> error.ContentRequired
+        _ -> error.BadRequest
+      }
+    }),
+  )
 
-      let count = returned.count
-      Ok(count)
-    }
-    _ -> {
-      Error(error.BadRequest)
-    }
-  }
+  let count = returned.count
+  Ok(count)
 }
