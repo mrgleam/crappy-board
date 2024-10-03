@@ -70,6 +70,7 @@ object AppDeployment:
       val labels = Map("app" -> name)
 
       val appNamespace = Namespace(name)
+      val redisNamespace = Namespace("redis")
 
       val postgresPort = args.postgresArgs.port
 
@@ -78,6 +79,21 @@ object AppDeployment:
       val ingressHost = args.appArgs.host
       val appReplicas = args.appArgs.replicas
       val appSecretKey = args.appArgs.secretKeyBase
+
+      // Deploy the Redis Helm chart
+      val redisChart = Chart(
+        "redis-cluster",
+        ChartArgs(
+          namespace = redisNamespace.metadata.name,
+          chart = "redis",
+          version = "17.4.1",
+          repositoryOpts = RepositoryOptsArgs(repo = "https://charts.bitnami.com/bitnami"),
+          values = scala.Predef.Map[String, besom.types.PulumiAny](
+            ("cluster" -> besom.json.JsObject("enabled" -> besom.json.JsTrue)),
+            ("metrics" -> besom.json.JsObject("enabled" -> besom.json.JsTrue)) 
+          )
+        )
+      )
 
       val postgresOperatorChart = Chart(
         "postgres-operator",
@@ -286,6 +302,8 @@ object AppDeployment:
       val appUrl =
         for
           _   <- appNamespace
+          _   <- redisNamespace
+          _   <- redisChart
           _   <- postgresOperatorChart
           _   <- postgresCluster
           _   <- appDeployment
