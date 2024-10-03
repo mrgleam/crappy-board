@@ -873,6 +873,10 @@ select {
   padding-bottom: 3rem;
 }
 
+.pr-1 {
+  padding-right: 0.25rem;
+}
+
 .text-center {
   text-align: center;
 }

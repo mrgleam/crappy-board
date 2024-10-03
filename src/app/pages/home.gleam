@@ -16,9 +16,23 @@ pub fn root(board_id: String, items: List(Item)) -> Element(t) {
   html.div([attribute.class("flex flex-col")], [
     html.div([attribute.class("flex justify-between m-1.5")], [
       html.h2([], [element.text("Crappy Board")]),
-      form([attribute.method("POST"), attribute.action("/signout")], [
-        button([attribute.class("bg-indigo-500 rounded p-1")], [
-          element.text("Sign out"),
+      html.div([attribute.class("flex flex-row")], [
+        form(
+          [
+            attribute.class("pr-1"),
+            attribute.method("GET"),
+            attribute.action("/invite"),
+          ],
+          [
+            button([attribute.class("bg-indigo-500 rounded p-1")], [
+              element.text("Invite"),
+            ]),
+          ],
+        ),
+        form([attribute.method("POST"), attribute.action("/signout")], [
+          button([attribute.class("bg-indigo-500 rounded p-1")], [
+            element.text("Sign out"),
+          ]),
         ]),
       ]),
     ]),
