@@ -3,6 +3,7 @@ import besom.api.hcloud
 import hcloud.inputs.*
 import besom.api.{kubernetes => k8s}
 import besom.api.{cloudflare => cf}
+import besom.api.command.*
 
 @main def main: Unit = Pulumi.run {
   val locations = Vector("fsn1", "nbg1", "hel1")
@@ -52,6 +53,39 @@ import besom.api.{cloudflare => cf}
 
   val nodeIps = serverPool.map(_.ipv4Address).parSequence
 
+  val tailscaleKey  = config.requireString("tailscale_key")
+
+  val initializeTailscale = serverPool.map(_.ipv4Address).zipWithIndex.map { case (ip, idx) =>
+      val serverIdx = idx + 1
+
+      val serverConn = remote.inputs.ConnectionArgs(
+        host = ip,
+        user = "root",
+        privateKey = sshPrivateKey
+      )
+
+      // Install Tailscale on the instance
+      val tailscaleInstall = remote.Command(
+        name = s"install-tailscale-$serverIdx",
+        args = remote.CommandArgs(
+          connection = serverConn,
+          create = "curl -fsSL https://tailscale.com/install.sh | sh"
+        )
+      )
+
+      val setupTailscale = remote.Command(
+        s"setup-tailscale-$serverIdx",
+        remote.CommandArgs(
+          connection = serverConn,
+          create =
+            p"sudo tailscale up --authkey $tailscaleKey" // Replace with your Tailscale auth key
+        ),
+        opts(dependsOn = tailscaleInstall)
+      )
+
+      setupTailscale
+  }.parSequence
+
   val clusterName = "crappy-board"
 
   val ghcrToken = config.requireString("github_docker_token").flatMap(_.toNonEmptyOutput)
@@ -94,7 +128,7 @@ import besom.api.{cloudflare => cf}
         replicas = 1,
         containerPort = 8000,
         servicePort = 8000,
-        host = "demo.planktonsoft.com",
+        host = "demo-crappy-board.planktonsoft.com",
         secretKeyBase
       )
     ),
@@ -116,7 +150,7 @@ import besom.api.{cloudflare => cf}
     cf.Record(
       s"crappy-board-a-record-$recordIdx",
       cf.RecordArgs(
-        name = "demo.planktonsoft.com",
+        name = "demo-crappy-board.planktonsoft.com",
         `type` = "A",
         value = server.ipv4Address,
         zoneId = config.requireString("cloudflare_zone_id"),
@@ -127,7 +161,7 @@ import besom.api.{cloudflare => cf}
     )
   }.parSequence
 
-  Stack(spawnNodes, writeKubeconfig, k3s, app, aRecords).exports(
+  Stack(spawnNodes, initializeTailscale, writeKubeconfig, k3s, app, aRecords).exports(
     nodes = nodeIps,
     kubeconfigPath = (os.pwd / "kubeconfig.conf").toString,
     url = app.flatMap(_.appUrl)

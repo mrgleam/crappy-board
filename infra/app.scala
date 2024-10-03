@@ -6,7 +6,7 @@ import k8s.core.v1.inputs.*
 import k8s.apps.v1.inputs.*
 import k8s.meta.v1.inputs.*
 import k8s.apps.v1.{Deployment, DeploymentArgs}
-import k8s.core.v1.{Namespace, Service, ServiceArgs}
+import k8s.core.v1.{Namespace, Service, ServiceArgs, NamespaceArgs}
 import k8s.networking.v1.{Ingress, IngressArgs}
 import k8s.networking.v1.inputs.{
   IngressSpecArgs,
@@ -70,7 +70,7 @@ object AppDeployment:
       val labels = Map("app" -> name)
 
       val appNamespace = Namespace(name)
-      val redisNamespace = Namespace("redis")
+      val redisNamespace = Namespace("redis-namespace", NamespaceArgs(metadata = ObjectMetaArgs(name = "redis")))
 
       val postgresPort = args.postgresArgs.port
 
@@ -86,9 +86,9 @@ object AppDeployment:
         ChartArgs(
           namespace = redisNamespace.metadata.name,
           chart = "redis",
-          version = "17.4.1",
+          version = Some("17.4.1"),
           repositoryOpts = RepositoryOptsArgs(repo = "https://charts.bitnami.com/bitnami"),
-          values = scala.Predef.Map[String, besom.types.PulumiAny](
+          values = Map(
             ("cluster" -> besom.json.JsObject("enabled" -> besom.json.JsTrue)),
             ("metrics" -> besom.json.JsObject("enabled" -> besom.json.JsTrue)) 
           )
@@ -148,6 +148,10 @@ object AppDeployment:
           opts = opts(dependsOn = postgresOperatorChart)
         )
 
+      val redisServiceName = redisChart.resources.getOrElse((Output(List()))).asInstanceOf[Output[List[(String, Service)]]].map(_.collectFirst {
+        case (name: String, service: Service) if name.contains("redis-master") => service.metadata.name.getOrElse("")
+      }.getOrElse(Output(""))).flatten
+
       val appDeployment =
         Deployment(
           name,
@@ -167,6 +171,7 @@ object AppDeployment:
                     image = "ghcr.io/mrgleam/crappy-board:latest",
                     env = List(
                       EnvVarArgs(name = "SECRET_KEY_BASE", value = appSecretKey),
+                      EnvVarArgs(name = "REDIS_HOST", value = redisServiceName),
                       EnvVarArgs(
                         name = "PG_USER",
                         valueFrom = EnvVarSourceArgs(
