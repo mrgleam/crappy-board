@@ -15,6 +15,7 @@ pub type User {
 
 /// Decode an item from a database row.
 ///
+/// Returns a dynamic decoder for the User type, decoding elements from the database row.
 pub fn user_row_decoder() -> dynamic.Decoder(User) {
   dynamic.decode4(
     User,
@@ -25,6 +26,17 @@ pub fn user_row_decoder() -> dynamic.Decoder(User) {
   )
 }
 
+/// Retrieve a user from the database using the provided email address.
+///
+/// # Arguments
+/// - `email`: The email address of the user to retrieve.
+/// - `db`: The database connection to execute the query.
+///
+/// # Returns
+/// - `Result(User, AppError)`: A Result type containing either the retrieved User object or an AppError.
+///
+/// # Raises
+/// - `error.BadRequest`: If there is an error during the database query execution or if no user is found with the provided email.
 pub fn get_user_by_email(
   email: String,
   db: Connection,
