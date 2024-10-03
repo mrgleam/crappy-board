@@ -105,6 +105,31 @@ pub fn signin_user(
   }
 }
 
+pub fn update_password_user(
+  user_id: String,
+  password: String,
+  db: Connection,
+) -> Result(Int, AppError) {
+  let sql = "UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2"
+  use returned <- result.then(
+    pgo.execute(
+      sql,
+      db,
+      [pgo.text(beecrypt.hash(password)), pgo.text(user_id)],
+      dynamic.int,
+    )
+    |> result.map_error(fn(error) {
+      io.debug(error)
+      case error {
+        _ -> error.BadRequest
+      }
+    }),
+  )
+
+  let count = returned.count
+  Ok(count)
+}
+
 pub fn activate_user(
   user_id: String,
   req_token: String,

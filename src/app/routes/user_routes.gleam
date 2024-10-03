@@ -4,7 +4,9 @@ import app/helpers/uuid
 import app/models/board.{create_board}
 import app/models/board_user.{create_board_user, list_board_user}
 import app/models/email.{send_forgot_password, send_verify_user}
-import app/models/user.{create_user, get_user_by_email, signin_user}
+import app/models/user.{
+  create_user, get_user_by_email, signin_user, update_password_user,
+}
 import app/pages
 import app/pages/layout.{layout}
 import app/web.{type Context, Context, bids_cookie, uid_cookie}
@@ -276,4 +278,65 @@ pub fn post_forgot_password(req: Request, ctx: Context) {
   |> layout
   |> element.to_document_string_builder
   |> wisp.html_response(200)
+}
+
+pub fn post_reset_password(req: Request, ctx: Context) {
+  use form <- wisp.require_form(req)
+
+  let password_validator =
+    valid.string_is_not_empty("password must not be empty")
+    |> valid.then(valid.string_min_length(
+      8,
+      "password must more than 8 charactor",
+    ))
+
+  let updated = {
+    use user_password <- result.try(
+      list.key_find(form.values, "password")
+      |> result.map_error(fn(_) { error.BadRequest }),
+    )
+
+    use _valid <- result.try(
+      password_validator(user_password)
+      |> result.map_error(fn(err) {
+        io.debug(err)
+        error.BadRequest
+      }),
+    )
+
+    use token <- result.try(
+      list.key_find(form.values, "token")
+      |> result.map_error(fn(err) {
+        io.debug(err)
+        error.BadRequest
+      }),
+    )
+
+    use user_id <- result.try(
+      radish.get(ctx.redis, token, constant.timeout)
+      |> result.map_error(fn(err) {
+        io.debug(err)
+        error.BadRequest
+      }),
+    )
+
+    use _ <- result.try(
+      radish.del(ctx.redis, [token], constant.timeout)
+      |> result.map_error(fn(err) {
+        io.debug(err)
+        error.BadRequest
+      }),
+    )
+
+    update_password_user(user_id, user_password, ctx.db)
+  }
+
+  case updated {
+    Ok(_) -> {
+      wisp.redirect("/signin")
+    }
+    Error(_) -> {
+      wisp.response(403)
+    }
+  }
 }

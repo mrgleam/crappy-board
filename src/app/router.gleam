@@ -5,6 +5,7 @@ import app/routes/item_routes
 import app/routes/user_routes
 import app/web.{type Context}
 import gleam/http
+import gleam/list
 import lustre/element
 import wisp.{type Request, type Response}
 
@@ -33,6 +34,7 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
       user_routes.post_sign_out()
     }
     ["forgot-password"] -> forgot_password(req, ctx)
+    ["reset-password"] -> reset_password(req, ctx)
     ["users", user_id, "activate"] -> {
       use <- wisp.require_method(req, http.Get)
       user_routes.activate_user(req, ctx, user_id)
@@ -134,4 +136,30 @@ fn get_forgot_password_form() -> Response {
   |> layout
   |> element.to_document_string_builder
   |> wisp.html_response(200)
+}
+
+fn reset_password(req: Request, ctx: Context) -> Response {
+  case req.method {
+    http.Get -> get_reset_password_form(req)
+    http.Post -> user_routes.post_reset_password(req, ctx)
+    _ -> wisp.method_not_allowed([http.Get, http.Post])
+  }
+}
+
+fn get_reset_password_form(req: Request) -> Response {
+  let queries = wisp.get_query(req)
+
+  let token = list.key_find(queries, "token")
+
+  case token {
+    Ok(token) -> {
+      [pages.reset_password(token, "")]
+      |> layout
+      |> element.to_document_string_builder
+      |> wisp.html_response(200)
+    }
+    Error(_) -> {
+      wisp.response(403)
+    }
+  }
 }
