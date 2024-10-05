@@ -10,6 +10,10 @@ pub fn layout(elements: List(element.Element(t))) -> element.Element(t) {
         attribute.name("viewport"),
         attribute.attribute("content", "width=device-width, initial-scale=1"),
       ]),
+      html.link([
+        attribute.rel("shortcut icon"),
+        attribute.href("/static/favicon.ico"),
+      ]),
       html.link([attribute.rel("stylesheet"), attribute.href("/static/app.css")]),
       html.link([attribute.rel("stylesheet"), attribute.href("/static/nav.css")]),
       html.link([
