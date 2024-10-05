@@ -40,7 +40,7 @@ packages = [
   { name = "simplifile", version = "1.7.0", build_tools = ["gleam"], requirements = ["filepath", "gleam_stdlib"], otp_app = "simplifile", source = "hex", outer_checksum = "1D5DFA3A2F9319EC85825F6ED88B8E449F381B0D55A62F5E61424E748E7DDEB0" },
   { name = "thoas", version = "1.2.1", build_tools = ["rebar3"], requirements = [], otp_app = "thoas", source = "hex", outer_checksum = "E38697EDFFD6E91BD12CEA41B155115282630075C2A727E7A6B2947F5408B86A" },
   { name = "tom", version = "0.3.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "tom", source = "hex", outer_checksum = "0831C73E45405A2153091226BF98FB485ED16376988602CC01A5FD086B82D577" },
-  { name = "valid", version = "4.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "non_empty_list"], otp_app = "valid", source = "hex", outer_checksum = "AFCF785EF15030EBC258EEB36551D3185EAA4B20DCBAA9CB398594335CEFAEAD" },
+  { name = "valid", version = "4.2.1", build_tools = ["gleam"], requirements = ["gleam_stdlib", "non_empty_list"], otp_app = "valid", source = "hex", outer_checksum = "11205B5DEB6FB35F5604858D0C994CB5813CF465D9A45A4AF6D1D64647C1F90D" },
   { name = "wisp", version = "0.14.0", build_tools = ["gleam"], requirements = ["exception", "gleam_crypto", "gleam_erlang", "gleam_http", "gleam_json", "gleam_stdlib", "logging", "marceau", "mist", "simplifile"], otp_app = "wisp", source = "hex", outer_checksum = "9F5453AF1F9275E6F8707BC815D6A6A9DF41551921B16FBDBA52883773BAE684" },
   { name = "zeptomail", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_http", "gleam_json", "gleam_stdlib"], otp_app = "zeptomail", source = "hex", outer_checksum = "8A90F7FB50324509B3F7E4F08A9C667823A2AEACE797F6050EA87B491B8948E6" },
 ]
@@ -60,6 +60,6 @@ lustre = { version = ">= 4.1.8 and < 5.0.0" }
 minigen = { version = ">= 0.1.1 and < 1.0.0" }
 mist = { version = ">= 1.2.0 and < 2.0.0" }
 radish = { version = ">= 0.15.0 and < 1.0.0" }
-valid = { version = ">= 4.2.0 and < 5.0.0" }
+valid = { version = ">= 4.2.1 and < 5.0.0" }
 wisp = { version = ">= 0.14.0 and < 1.0.0" }
 zeptomail = { version = ">= 1.1.0 and < 2.0.0" }
