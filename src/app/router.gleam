@@ -39,6 +39,7 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
       use <- wisp.require_method(req, http.Get)
       user_routes.activate_user(req, ctx)
     }
+    ["invite"] -> invite(req, ctx)
     ["boards", board_id, "items", "create"] -> {
       use ctx <- web.authenticate(req, ctx)
       use ctx <- web.authorized(req, ctx)
@@ -162,4 +163,19 @@ fn get_reset_password_form(req: Request) -> Response {
       wisp.response(403)
     }
   }
+}
+
+fn invite(req: Request, ctx: Context) -> Response {
+  case req.method {
+    http.Get -> get_invite_form()
+    http.Post -> user_routes.post_invite(req, ctx)
+    _ -> wisp.method_not_allowed([http.Get, http.Post])
+  }
+}
+
+fn get_invite_form() -> Response {
+  [pages.invite("")]
+  |> layout
+  |> element.to_document_string_builder
+  |> wisp.html_response(200)
 }

@@ -336,3 +336,7 @@ pub fn post_reset_password(req: Request, ctx: Context) {
     }
   }
 }
+
+pub fn post_invite(req: Request, ctx: Context) {
+  todo
+}

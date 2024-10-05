@@ -1,3 +1,4 @@
+import app/components/nav
 import app/helpers/uuid
 import app/models/item.{
   type Item, item_status_to_string, next_status, prev_status,
@@ -13,29 +14,8 @@ import lustre/element/html.{button, form, svg, textarea}
 import lustre/element/svg
 
 pub fn root(board_id: String, items: List(Item)) -> Element(t) {
-  html.div([attribute.class("flex flex-col")], [
-    html.div([attribute.class("flex justify-between m-1.5")], [
-      html.h2([], [element.text("Crappy Board")]),
-      html.div([attribute.class("flex flex-row")], [
-        form(
-          [
-            attribute.class("pr-1"),
-            attribute.method("GET"),
-            attribute.action("/invite"),
-          ],
-          [
-            button([attribute.class("bg-indigo-500 rounded p-1")], [
-              element.text("Invite"),
-            ]),
-          ],
-        ),
-        form([attribute.method("POST"), attribute.action("/signout")], [
-          button([attribute.class("bg-indigo-500 rounded p-1")], [
-            element.text("Sign out"),
-          ]),
-        ]),
-      ]),
-    ]),
+  html.div([attribute.class("flex flex-col nav-bar-padding-space")], [
+    html.div([], [nav.nav_bar()]),
     html.div([attribute.class("flex")], [
       html.div([attribute.class("flex-1")], [
         html.div(

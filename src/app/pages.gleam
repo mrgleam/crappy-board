@@ -1,6 +1,7 @@
 import app/models/item.{type Item}
 import app/pages/forgot_password
 import app/pages/home
+import app/pages/invite
 import app/pages/reset_password
 import app/pages/signin
 import app/pages/signup
@@ -33,4 +34,8 @@ pub fn submit_forgot_password() {
 
 pub fn reset_password(token: String, error: String) {
   reset_password.root(token, error)
+}
+
+pub fn invite(error: String) {
+  invite.root(error)
 }
