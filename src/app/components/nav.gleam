@@ -63,11 +63,11 @@ fn nav_button(
   text: String,
   method: String,
   link: String,
-  open_new_tabe: Bool,
+  open_new_tab: Bool,
 ) -> element.Element(t) {
   let form_attributes = [attribute.method(method), attribute.action(link)]
 
-  let form_attributes = case open_new_tabe {
+  let form_attributes = case open_new_tab {
     True -> list.prepend(form_attributes, attribute.target("_blank"))
     False -> form_attributes
   }
