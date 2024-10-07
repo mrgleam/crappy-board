@@ -1,3 +1,4 @@
+import gleam/list
 import lustre/attribute
 import lustre/element
 import lustre/element/html
@@ -44,21 +45,22 @@ fn nav_header() -> element.Element(t) {
 
 fn nav_content() -> element.Element(t) {
   html.div([attribute.id("nav-content")], [
-    nav_button("fas fa-solid fa-user-plus", "Invite", "GET", "/invite"),
+    nav_button("fas fa-solid fa-user-plus", "Invite", "GET", "/invite", True),
     // nav_button("fas fa-images", "Assets", "GET", "#"),
     // nav_button("fas fa-thumbtack", "Pinned Items", "GET", "#"),
     html.hr([]),
     // nav_button("fas fa-heart", "Following", "GET", "#"),
-    nav_button("fas fa-chart-line", "Trending", "GET", "#"),
+    nav_button("fas fa-chart-line", "Trending", "GET", "#", False),
     // nav_button("fas fa-fire", "Challenges", "GET", "#"),
     // nav_button("fas fa-magic", "Spark", "GET", "#"),
-    nav_button("fas fa-solid fa-gear", "Setting", "GET", "#"),
+    nav_button("fas fa-solid fa-gear", "Setting", "GET", "#", False),
     html.hr([]),
     nav_button(
       "fas fa-solid fa-arrow-right-from-bracket",
       "Sign Out",
       "POST",
       "/signout",
+      False,
     ),
   ])
 }
@@ -68,12 +70,18 @@ fn nav_button(
   text: String,
   method: String,
   link: String,
+  open_new_tabe: Bool,
 ) -> element.Element(t) {
+  let form_attributes = [attribute.method(method), attribute.action(link)]
+
+  let form_attributes = case open_new_tabe {
+    True -> list.prepend(form_attributes, attribute.target("_blank"))
+    False -> form_attributes
+  }
+
   html.div([attribute.class("nav-button")], [
     html.i([attribute.class(icon_class)], []),
-    html.form([attribute.method(method), attribute.action(link)], [
-      html.button([], [element.text(text)]),
-    ]),
+    html.form(form_attributes, [html.button([], [element.text(text)])]),
   ])
 }
 
