@@ -3,7 +3,7 @@ import app/helpers/constant
 import app/helpers/uuid
 import app/models/board.{create_board}
 import app/models/board_user.{create_board_user, list_board_user}
-import app/models/email.{send_forgot_password, send_verify_user}
+import app/models/email.{send_forgot_password, send_invite, send_verify_user}
 import app/models/user.{
   create_user, get_user_by_email, signin_user, update_password_user,
 }
@@ -338,5 +338,49 @@ pub fn post_reset_password(req: Request, ctx: Context) {
 }
 
 pub fn post_invite(req: Request, ctx: Context) {
-  todo
+  use form <- wisp.require_form(req)
+
+  let email_validator = valid.string_is_email("Not email")
+
+  let _result = {
+    use user_email <- result.try(
+      list.key_find(form.values, "email")
+      |> result.map_error(fn(_) { error.BadRequest }),
+    )
+
+    use _valid <- result.try(
+      email_validator(user_email)
+      |> result.map_error(fn(err) {
+        io.debug(err)
+        error.BadRequest
+      }),
+    )
+
+    use user_id <- result.try(
+      get_user_by_email(user_email, ctx.db)
+      |> result.map(fn(user) {
+        uuid.cast(user.id) |> result.map_error(fn(_) { error.BadRequest })
+      })
+      |> result.flatten,
+    )
+
+    let token = minigen.string(20) |> minigen.run
+
+    use _ <- result.try(
+      radish.set(ctx.redis, token, user_id, constant.timeout)
+      |> result.map(fn(_) {
+        radish.expire(ctx.redis, token, constant.expired, constant.timeout)
+      })
+      |> result.map_error(fn(_) { error.BadRequest }),
+    )
+
+    let invite_link = ctx.base_url <> "/join?token=" <> token
+
+    send_invite(ctx.email_api_key, user_email, invite_link)
+  }
+
+  [pages.submit_invite()]
+  |> layout
+  |> element.to_document_string_builder
+  |> wisp.html_response(200)
 }

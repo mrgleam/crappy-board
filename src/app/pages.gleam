@@ -7,6 +7,7 @@ import app/pages/signin
 import app/pages/signup
 import app/pages/signup_success
 import app/pages/submit_forgot_password
+import app/pages/submit_invite
 
 pub fn home(board_id: String, items: List(Item)) {
   home.root(board_id, items)
@@ -38,4 +39,8 @@ pub fn reset_password(token: String, error: String) {
 
 pub fn invite(error: String) {
   invite.root(error)
+}
+
+pub fn submit_invite() {
+  submit_invite.root()
 }
