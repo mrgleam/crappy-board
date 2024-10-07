@@ -23,19 +23,12 @@ fn nav_toggle() -> element.Element(t) {
 
 fn nav_header() -> element.Element(t) {
   html.div([attribute.id("nav-header")], [
-    html.a(
-      [
-        attribute.id("nav-title"),
-        attribute.href("https://codepen.io"),
-        attribute.target("_blank"),
-      ],
-      [
-        element.text("CR"),
-        html.i([attribute.class("fa-brands fa-accessible-icon")], []),
-        element.text("PPY "),
-        html.i([attribute.class("fa-solid fa-person-chalkboard")], []),
-      ],
-    ),
+    html.a([attribute.id("nav-title"), attribute.href("#")], [
+      element.text("CR"),
+      html.i([attribute.class("fa-brands fa-accessible-icon")], []),
+      element.text("PPY "),
+      html.i([attribute.class("fa-solid fa-person-chalkboard")], []),
+    ]),
     html.label([attribute.for("nav-toggle")], [
       html.span([attribute.id("nav-toggle-burger")], []),
     ]),
