@@ -1,7 +1,7 @@
 import app/error
 import app/helpers/constant
 import app/helpers/uuid
-import app/models/board.{create_board}
+import app/models/board.{type Board, create_board}
 import app/models/board_user.{create_board_user, list_board_user}
 import app/models/email.{send_forgot_password, send_invite, send_verify_user}
 import app/models/user.{
@@ -361,10 +361,28 @@ pub fn post_invite(req: Request, ctx: Context) {
       |> result.map_error(fn(_) { error.BadRequest }),
     )
 
+    use user_id <- result.try(
+      get_user_by_email(user_email, ctx.db)
+      |> result.map(fn(user) {
+        uuid.cast(user.id) |> result.map_error(fn(_) { error.BadRequest })
+      })
+      |> result.flatten,
+    )
+
     let token = minigen.string(20) |> minigen.run
 
     use _ <- result.try(
-      radish.set(ctx.redis, token, board_id, constant.timeout)
+      radish.set(
+        ctx.redis,
+        token,
+        json.to_string(
+          json.object([
+            #("board_id", json.string(board_id)),
+            #("user_id", json.string(user_id)),
+          ]),
+        ),
+        constant.timeout,
+      )
       |> result.map(fn(_) {
         radish.expire(ctx.redis, token, constant.expired, constant.timeout)
       })
