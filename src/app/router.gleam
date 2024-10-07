@@ -39,6 +39,10 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
       use <- wisp.require_method(req, http.Get)
       user_routes.activate_user(req, ctx)
     }
+    ["join"] -> {
+      use <- wisp.require_method(req, http.Get)
+      user_routes.join_board(req, ctx)
+    }
     ["boards", board_id, "invite"] -> {
       use ctx <- web.authenticate(req, ctx)
       use ctx <- web.authorized(req, ctx)

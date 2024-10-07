@@ -381,3 +381,7 @@ pub fn post_invite(req: Request, ctx: Context) {
   |> element.to_document_string_builder
   |> wisp.html_response(200)
 }
+
+pub fn join_board(req: Request, ctx: Context) {
+  todo
+}
