@@ -1,12 +1,28 @@
 import app/error.{type AppError}
+import app/helpers/constant
 import app/models/board.{type Board, board_row_decoder}
 import gleam/dynamic
+import gleam/erlang/process.{type Subject}
 import gleam/io
+import gleam/json
 import gleam/pgo.{type Connection}
 import gleam/result
+import radish.{type Message}
 
 pub type BoardUser {
   BoardUser(board_id: BitArray, user_id: BitArray)
+}
+
+pub type Join {
+  Join(board_id: String, user_id: String)
+}
+
+pub fn join_decoder() -> dynamic.Decoder(Join) {
+  dynamic.decode2(
+    Join,
+    dynamic.field("board_id", of: dynamic.string),
+    dynamic.field("user_id", of: dynamic.string),
+  )
 }
 
 pub fn create_board_user(
@@ -54,4 +70,26 @@ pub fn list_board_user(user_id: String, db: Connection) -> List(Board) {
     pgo.execute(sql, db, [pgo.text(user_id)], board_row_decoder())
 
   returned.rows
+}
+
+pub fn join(req_token: String, db: Connection, redis: Subject(Message)) {
+  use data <- result.try(
+    radish.get(redis, req_token, constant.timeout)
+    |> result.map(fn(obj) {
+      json.decode(obj, join_decoder())
+      |> result.map_error(fn(error) {
+        io.debug(error)
+        error.BadRequest
+      })
+    })
+    |> result.map_error(fn(error) {
+      io.debug(error)
+      error.BadRequest
+    })
+    |> result.flatten,
+  )
+
+  io.debug(data)
+
+  create_board_user(data.board_id, data.user_id, db)
 }

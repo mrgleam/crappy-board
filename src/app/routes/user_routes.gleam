@@ -1,7 +1,7 @@
 import app/error
 import app/helpers/constant
 import app/helpers/uuid
-import app/models/board.{type Board, create_board}
+import app/models/board.{create_board}
 import app/models/board_user.{create_board_user, list_board_user}
 import app/models/email.{send_forgot_password, send_invite, send_verify_user}
 import app/models/user.{
@@ -401,5 +401,23 @@ pub fn post_invite(req: Request, ctx: Context) {
 }
 
 pub fn join_board(req: Request, ctx: Context) {
-  todo
+  let queries = wisp.get_query(req)
+
+  let joined = {
+    use token <- result.try(
+      list.key_find(queries, "token")
+      |> result.map_error(fn(_) { error.BadRequest }),
+    )
+
+    board_user.join(token, ctx.db, ctx.redis)
+  }
+
+  case joined {
+    Ok(_) -> {
+      wisp.redirect("/signin")
+    }
+    Error(_) -> {
+      wisp.response(403)
+    }
+  }
 }
