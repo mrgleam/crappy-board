@@ -62,3 +62,34 @@ pub fn get_string_id(board: Result(Board, Nil)) {
     Error(_) -> ""
   }
 }
+
+pub fn get_board_by_owner_id(
+  owner_id: String,
+  db: Connection,
+) -> Result(BitArray, AppError) {
+  let sql =
+    "
+      SELECT
+        id,
+      FROM
+        boards
+      WHERE owner_id = $1
+    "
+
+  use returned <- result.then(
+    pgo.execute(
+      sql,
+      db,
+      [pgo.text(owner_id)],
+      dynamic.element(0, dynamic.bit_array),
+    )
+    |> result.map_error(fn(error) {
+      io.debug(error)
+      case error {
+        _ -> error.BadRequest
+      }
+    }),
+  )
+
+  list.first(returned.rows) |> result.map_error(fn(_) { error.BadRequest })
+}

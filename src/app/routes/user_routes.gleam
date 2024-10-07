@@ -356,18 +356,15 @@ pub fn post_invite(req: Request, ctx: Context) {
       }),
     )
 
-    use user_id <- result.try(
-      get_user_by_email(user_email, ctx.db)
-      |> result.map(fn(user) {
-        uuid.cast(user.id) |> result.map_error(fn(_) { error.BadRequest })
-      })
-      |> result.flatten,
+    use board_id <- result.try(
+      list.key_find(form.values, "board")
+      |> result.map_error(fn(_) { error.BadRequest }),
     )
 
     let token = minigen.string(20) |> minigen.run
 
     use _ <- result.try(
-      radish.set(ctx.redis, token, user_id, constant.timeout)
+      radish.set(ctx.redis, token, board_id, constant.timeout)
       |> result.map(fn(_) {
         radish.expire(ctx.redis, token, constant.expired, constant.timeout)
       })

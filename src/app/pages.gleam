@@ -37,8 +37,8 @@ pub fn reset_password(token: String, error: String) {
   reset_password.root(token, error)
 }
 
-pub fn invite(error: String) {
-  invite.root(error)
+pub fn invite(board_id: String, error: String) {
+  invite.root(board_id, error)
 }
 
 pub fn submit_invite() {

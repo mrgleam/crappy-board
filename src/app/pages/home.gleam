@@ -15,7 +15,7 @@ import lustre/element/svg
 
 pub fn root(board_id: String, items: List(Item)) -> Element(t) {
   html.div([attribute.class("flex flex-col nav-bar-padding-space")], [
-    html.div([], [nav.nav_bar()]),
+    html.div([], [nav.nav_bar(board_id)]),
     html.div([attribute.class("flex")], [
       html.div([attribute.class("flex-1")], [
         html.div(

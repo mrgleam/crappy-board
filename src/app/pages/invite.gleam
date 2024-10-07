@@ -2,7 +2,7 @@ import lustre/attribute.{attribute}
 import lustre/element.{type Element}
 import lustre/element/html
 
-pub fn root(error: String) -> Element(t) {
+pub fn root(board_id: String, error: String) -> Element(t) {
   html.div(
     [
       attribute.class(
@@ -25,10 +25,23 @@ pub fn root(error: String) -> Element(t) {
           [
             attribute.class("space-y-6"),
             attribute.method("POST"),
-            attribute.action("/invite"),
+            attribute.action("/boards/" <> board_id <> "/invite"),
           ],
           [
             html.div([], [
+              html.div([], [
+                html.div([attribute.class("mt-2")], [
+                  html.input([
+                    attribute.class(
+                      "block w-full bg-white/[.05] rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-white/[.1] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6",
+                    ),
+                    attribute.id("board"),
+                    attribute.name("board"),
+                    attribute.type_("hidden"),
+                    attribute.value(board_id),
+                  ]),
+                ]),
+              ]),
               html.label(
                 [
                   attribute.for("email"),

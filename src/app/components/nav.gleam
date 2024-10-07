@@ -3,11 +3,11 @@ import lustre/attribute
 import lustre/element
 import lustre/element/html
 
-pub fn nav_bar() -> element.Element(t) {
+pub fn nav_bar(board_id: String) -> element.Element(t) {
   html.div([attribute.id("nav-bar")], [
     nav_toggle(),
     nav_header(),
-    nav_content(),
+    nav_content(board_id),
     nav_footer_toggle(),
     nav_footer(),
   ])
@@ -36,9 +36,15 @@ fn nav_header() -> element.Element(t) {
   ])
 }
 
-fn nav_content() -> element.Element(t) {
+fn nav_content(board_id: String) -> element.Element(t) {
   html.div([attribute.id("nav-content")], [
-    nav_button("fas fa-solid fa-user-plus", "Invite", "GET", "/invite", True),
+    nav_button(
+      "fas fa-solid fa-user-plus",
+      "Invite",
+      "GET",
+      "/boards/" <> board_id <> "/invite",
+      True,
+    ),
     // nav_button("fas fa-images", "Assets", "GET", "#"),
     // nav_button("fas fa-thumbtack", "Pinned Items", "GET", "#"),
     html.hr([]),
