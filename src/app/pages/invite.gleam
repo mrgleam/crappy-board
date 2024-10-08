@@ -56,6 +56,7 @@ pub fn root(board_id: String, error: String) -> Element(t) {
                   ),
                   attribute.id("email"),
                   attribute.name("email"),
+                  attribute.placeholder("Please enter email"),
                   attribute.type_("email"),
                 ]),
               ]),
@@ -64,6 +65,7 @@ pub fn root(board_id: String, error: String) -> Element(t) {
               html.button(
                 [
                   attribute.type_("sumbit"),
+                  attribute.attribute("data-testid", "submit"),
                   attribute.class(
                     "flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600",
                   ),

@@ -1,12 +1,12 @@
 import { expect } from '@playwright/test';
 import { test as setup } from './my-test';
 
-const authFile = 'playwright/.auth/user.json';
+const authFile01 = 'playwright/.auth/user01.json';
 
 setup('authenticate', async ({ page, boardId }) => {
   // Perform authentication steps. Replace these actions with your own.
   await page.goto('/signin');
-  await page.getByLabel('Email address').fill('aaa@aaa.com');
+  await page.getByLabel('Email address').fill('aaa01@aaa.com');
   await page.getByLabel('Password').fill('aaaaaaaa');
   await page.getByRole('button', { name: 'Sign in' }).click();
   // Wait until the page receives the cookies.
@@ -19,5 +19,5 @@ setup('authenticate', async ({ page, boardId }) => {
 
   // End of authentication steps.
 
-  await page.context().storageState({ path: authFile });
+  await page.context().storageState({ path: authFile01 });
 });

@@ -72,6 +72,25 @@ pub fn list_board_user(user_id: String, db: Connection) -> List(Board) {
   returned.rows
 }
 
+pub fn count_board_user(user_id: String, db: Connection) -> Int {
+  let sql =
+    "
+      SELECT
+        count(*)
+      FROM
+        boards_users
+      WHERE
+        user_id = $1
+    "
+
+  let assert Ok(returned) =
+    pgo.execute(sql, db, [pgo.text(user_id)], dynamic.element(0, dynamic.int))
+
+  let assert [count] = returned.rows
+
+  count
+}
+
 pub fn join(req_token: String, db: Connection, redis: Subject(Message)) {
   use data <- result.try(
     radish.get(redis, req_token, constant.timeout)
@@ -92,4 +111,18 @@ pub fn join(req_token: String, db: Connection, redis: Subject(Message)) {
   io.debug(data)
 
   create_board_user(data.board_id, data.user_id, db)
+}
+
+pub fn validate_board_user(
+  user_id: String,
+  db: Connection,
+) -> Result(Int, AppError) {
+  case count_board_user(user_id, db) {
+    a if a >= 10 -> {
+      Error(error.BadRequest)
+    }
+    a -> {
+      Ok(a)
+    }
+  }
 }

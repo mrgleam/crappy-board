@@ -2,7 +2,9 @@ import app/error
 import app/helpers/constant
 import app/helpers/uuid
 import app/models/board.{create_board}
-import app/models/board_user.{create_board_user, list_board_user}
+import app/models/board_user.{
+  create_board_user, list_board_user, validate_board_user,
+}
 import app/models/email.{send_forgot_password, send_invite, send_verify_user}
 import app/models/user.{
   create_user, get_user_by_email, signin_user, update_password_user,
@@ -342,7 +344,7 @@ pub fn post_invite(req: Request, ctx: Context) {
 
   let email_validator = valid.string_is_email("Not email")
 
-  let _result = {
+  let result = {
     use user_email <- result.try(
       list.key_find(form.values, "email")
       |> result.map_error(fn(_) { error.BadRequest }),
@@ -369,6 +371,8 @@ pub fn post_invite(req: Request, ctx: Context) {
       |> result.flatten,
     )
 
+    use _ <- result.try(validate_board_user(user_id, ctx.db))
+
     let token = minigen.string(20) |> minigen.run
 
     use _ <- result.try(
@@ -394,10 +398,17 @@ pub fn post_invite(req: Request, ctx: Context) {
     send_invite(ctx.email_api_key, user_email, invite_link)
   }
 
-  [pages.submit_invite()]
-  |> layout
-  |> element.to_document_string_builder
-  |> wisp.html_response(200)
+  case result {
+    Ok(_) -> {
+      [pages.submit_invite()]
+      |> layout
+      |> element.to_document_string_builder
+      |> wisp.html_response(200)
+    }
+    Error(_) -> {
+      wisp.response(403)
+    }
+  }
 }
 
 pub fn join_board(req: Request, ctx: Context) {

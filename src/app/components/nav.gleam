@@ -1,5 +1,6 @@
 import gleam/int
 import gleam/list
+import gleam/string
 import lustre/attribute
 import lustre/element
 import lustre/element/html
@@ -31,7 +32,13 @@ fn nav_header() -> element.Element(t) {
       html.i([attribute.class("fa-solid fa-person-chalkboard")], []),
     ]),
     html.label([attribute.for("nav-toggle")], [
-      html.span([attribute.id("nav-toggle-burger")], []),
+      html.span(
+        [
+          attribute.id("nav-toggle-burger"),
+          attribute.attribute("data-testid", "show-menu"),
+        ],
+        [],
+      ),
     ]),
     html.hr([]),
   ])
@@ -99,7 +106,11 @@ fn nav_button(
 
   html.div([attribute.class("nav-button")], [
     html.i([attribute.class(icon_class)], []),
-    html.form(form_attributes, [html.button([], [element.text(text)])]),
+    html.form(form_attributes, [
+      html.button([attribute.attribute("data-testid", string.lowercase(text))], [
+        element.text(text),
+      ]),
+    ]),
   ])
 }
 
