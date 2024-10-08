@@ -1,5 +1,7 @@
 import app/error
-import app/models/item.{create_item, delete_item, patch_item}
+import app/models/item.{
+  create_item, delete_item, patch_item, validate_board_items,
+}
 import app/web.{type Context, Context}
 import gleam/list
 import gleam/result
@@ -7,12 +9,13 @@ import wisp.{type Request}
 
 pub fn post_create_item(req: Request, ctx: Context, board_id: String) {
   use form <- wisp.require_form(req)
-
   let result = {
     use item_content <- result.try(
       list.key_find(form.values, "todo_input")
       |> result.map_error(fn(_) { error.BadRequest }),
     )
+    use _ <- result.try(validate_board_items(board_id, ctx.db))
+
     create_item(board_id, item_content, ctx.db)
   }
 

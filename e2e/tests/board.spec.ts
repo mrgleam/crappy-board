@@ -7,23 +7,29 @@ test.beforeEach(async ({ page, boardId }) => {
   await page.goto(`/boards/${boardId}`);
 });
 
-test.afterEach(async ({ page }) => {
+test.afterEach(async ({ page, boardId }) => {
+  await page.goto(`/boards/${boardId}`);
+
   const todoItems = page.getByTestId("todo-items").locator("ul > li");
-  await deleteItems(todoItems);
+  await deleteItems(todoItems, add1);
 
   const doingItems = page.getByTestId("doing-items").locator("ul > li");
-  await deleteItems(doingItems);
+  await deleteItems(doingItems, identity);
 
   const doneItems = page.getByTestId("done-items").locator("ul > li");
-  await deleteItems(doneItems);
+  await deleteItems(doneItems, identity);
 });
 
-async function deleteItems(locator: Locator) {
+const add1: (number) => number =  (a) => a + 1;
+
+const identity: (number) => number =  (a) => a;
+
+async function deleteItems(locator: Locator, fn: (number) => number) {
   const count = await locator.count();
-  if (count > 1) {
-    for (let i = 1; i < count; i++) {
-      await locator.nth(1).hover();
-      await locator.nth(1).getByTestId("delete-todo").click();
+  if (count > fn(0)) {
+    for (let i = fn(0); i < count; i++) {
+      await locator.nth(fn(0)).hover();
+      await locator.nth(fn(0)).getByTestId("delete-todo").click();
     }
   }
 }
@@ -70,6 +76,24 @@ test.describe("New Todo", () => {
 
     // Check that input is empty.
     await expect(newTodo).toBeEmpty();
+  });
+
+  test("should not allow me to add todo items when the board is limited to the number of items", async ({ page }) => {
+    // create a new todo locator
+    const newTodo = page.getByPlaceholder("What needs to be done?");
+
+    for (let i = 0; i < 20; i++) {
+      await newTodo.fill(TODO_ITEMS[0]);
+      await page.getByTestId("create-todo").click();
+    }
+
+    const responseSubmit = page.waitForResponse('**/items/create');
+    // Create item todo.
+    await newTodo.fill(TODO_ITEMS[0]);
+    await page.getByTestId("create-todo").click();
+
+    const response = await responseSubmit;
+    expect(response.status()).toBe(400);
   });
 });
 
@@ -118,7 +142,7 @@ test.describe('Item', () => {
   })
 });
 
-test.describe('Validate', () => {
+test.describe('Invite', () => {
   test('should allow me to add user', async ({ page, context }) => {
     await page.getByTestId("show-menu").click();
 

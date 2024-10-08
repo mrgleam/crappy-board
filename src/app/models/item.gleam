@@ -143,6 +143,35 @@ pub fn patch_item(
   Ok(count)
 }
 
+pub fn count_items(board_id: String, db: Connection) -> Int {
+  let sql =
+    "
+      SELECT
+        count(*)
+      FROM
+        tasks
+      WHERE
+        board_id = $1
+    "
+
+  let assert Ok(returned) =
+    pgo.execute(sql, db, [pgo.text(board_id)], dynamic.element(0, dynamic.int))
+
+  let assert [count] = returned.rows
+
+  count
+}
+
+pub fn validate_board_items(
+  board_id: String,
+  db: Connection,
+) -> Result(Int, AppError) {
+  case count_items(board_id, db) {
+    a if a >= 20 -> Error(error.BadRequest)
+    a -> Ok(a)
+  }
+}
+
 pub fn item_status_to_string(status: ItemStatus) -> String {
   case status {
     Todo -> "TODO"
