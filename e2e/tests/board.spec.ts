@@ -141,8 +141,7 @@ test.describe('Validate', () => {
 
     const response = await responseSubmit;
     expect(response.status()).toBe(200);
-    expect(newPage.getByText('Invitation Successful!')).toBeVisible();
-
+    await expect(newPage.getByText('Invitation Successful!')).toBeVisible();
   });
 
   test('should not allow me to add user when the user is limited to the number of boards they can join', async ({ page, context }) => {
