@@ -12,6 +12,7 @@ import app/models/user.{
 import app/pages
 import app/pages/layout.{layout}
 import app/web.{type Context, Context, bids_cookie, uid_cookie}
+import gleam/function
 import gleam/http.{Http}
 import gleam/http/cookie
 import gleam/http/response
@@ -345,30 +346,22 @@ pub fn post_invite(req: Request, ctx: Context) {
   let email_validator = valid.string_is_email("Not email")
 
   let result = {
-    use user_email <- result.try(
-      list.key_find(form.values, "email")
-      |> result.map_error(fn(_) { error.BadRequest }),
-    )
+    use user_email <-
+      error.try_bad_request(
+        list.key_find(form.values, "email"),
+        email_validator,
+      )
+      |> function.curry2(result.try)
 
-    use _valid <- result.try(
-      email_validator(user_email)
-      |> result.map_error(fn(err) {
-        io.debug(err)
-        error.BadRequest
-      }),
-    )
+    use user_id <-
+      error.try_bad_request(
+        result.map(get_user_by_email(user_email, ctx.db), fn(u) { u.id }),
+        uuid.cast,
+      )
+      |> function.curry2(result.try)
 
     use board_id <- result.try(
-      list.key_find(form.values, "board")
-      |> result.map_error(fn(_) { error.BadRequest }),
-    )
-
-    use user_id <- result.try(
-      get_user_by_email(user_email, ctx.db)
-      |> result.map(fn(user) {
-        uuid.cast(user.id) |> result.map_error(fn(_) { error.BadRequest })
-      })
-      |> result.flatten,
+      error.map_bad_request(list.key_find(form.values, "board")),
     )
 
     use _ <- result.try(validate_board_user(user_id, ctx.db))
