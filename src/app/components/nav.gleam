@@ -1,13 +1,14 @@
+import gleam/int
 import gleam/list
 import lustre/attribute
 import lustre/element
 import lustre/element/html
 
-pub fn nav_bar(board_id: String) -> element.Element(t) {
+pub fn nav_bar(board_id: String, board_ids: List(String)) -> element.Element(t) {
   html.div([attribute.id("nav-bar")], [
     nav_toggle(),
     nav_header(),
-    nav_content(board_id),
+    nav_content(board_id, board_ids),
     nav_footer_toggle(),
     nav_footer(),
   ])
@@ -36,8 +37,19 @@ fn nav_header() -> element.Element(t) {
   ])
 }
 
-fn nav_content(board_id: String) -> element.Element(t) {
-  html.div([attribute.id("nav-content")], [
+fn nav_content(board_id: String, board_ids: List(String)) -> element.Element(t) {
+  let boards =
+    list.index_map(board_ids, fn(bid, i) {
+      nav_button(
+        "fas fa-solid fa-" <> int.to_string(i + 1),
+        "Board " <> int.to_string(i + 1),
+        "GET",
+        "/boards/" <> bid,
+        False,
+      )
+    })
+
+  let fst_menu = [
     nav_button(
       "fas fa-solid fa-user-plus",
       "Invite",
@@ -48,20 +60,27 @@ fn nav_content(board_id: String) -> element.Element(t) {
     // nav_button("fas fa-images", "Assets", "GET", "#"),
     // nav_button("fas fa-thumbtack", "Pinned Items", "GET", "#"),
     html.hr([]),
-    // nav_button("fas fa-heart", "Following", "GET", "#"),
-    nav_button("fas fa-chart-line", "Trending", "GET", "#", False),
-    // nav_button("fas fa-fire", "Challenges", "GET", "#"),
-    // nav_button("fas fa-magic", "Spark", "GET", "#"),
-    nav_button("fas fa-solid fa-gear", "Setting", "GET", "#", False),
-    html.hr([]),
-    nav_button(
-      "fas fa-solid fa-arrow-right-from-bracket",
-      "Sign Out",
-      "POST",
-      "/signout",
-      False,
-    ),
-  ])
+  ]
+
+  let menu =
+    list.append(list.append(fst_menu, boards), [
+      html.hr([]),
+      // nav_button("fas fa-heart", "Following", "GET", "#"),
+      nav_button("fas fa-chart-line", "Trending", "GET", "#", False),
+      // nav_button("fas fa-fire", "Challenges", "GET", "#"),
+      // nav_button("fas fa-magic", "Spark", "GET", "#"),
+      nav_button("fas fa-solid fa-gear", "Setting", "GET", "#", False),
+      html.hr([]),
+      nav_button(
+        "fas fa-solid fa-arrow-right-from-bracket",
+        "Sign Out",
+        "POST",
+        "/signout",
+        False,
+      ),
+    ])
+
+  html.div([attribute.id("nav-content")], menu)
 }
 
 fn nav_button(

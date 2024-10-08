@@ -9,8 +9,8 @@ import app/pages/signup_success
 import app/pages/submit_forgot_password
 import app/pages/submit_invite
 
-pub fn home(board_id: String, items: List(Item)) {
-  home.root(board_id, items)
+pub fn home(board_id: String, board_ids: List(String), items: List(Item)) {
+  home.root(board_id, board_ids, items)
 }
 
 pub fn signup(error: String) {

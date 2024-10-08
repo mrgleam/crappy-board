@@ -97,7 +97,8 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
 
 fn home(board_id: String, ctx: Context) -> Response {
   let items = item.list_items(board_id, ctx.db)
-  [pages.home(board_id, items)]
+  let board_ids = ctx.board_ids
+  [pages.home(board_id, board_ids, items)]
   |> layout
   |> element.to_document_string_builder
   |> wisp.html_response(200)
