@@ -1,7 +1,6 @@
 import app/error.{type AppError}
 import app/templates
 import app/templates/layout.{layout}
-import gleam/function.{curry2}
 import gleam/httpc
 import gleam/io
 import gleam/result
@@ -17,7 +16,7 @@ pub fn send_verify_user(
 
   let body =
     [templates.signup_confirmation(confirmation_link)]
-    |> curry2(layout)("Account Confirmation")
+    |> fn(el) { layout("Account Confirmation", el) }
     |> element.to_string
 
   let email =
@@ -60,7 +59,7 @@ pub fn send_forgot_password(
 
   let body =
     [templates.forgot_password_confirmation(reset_password_link)]
-    |> curry2(layout)("Forgot Password Confirmation")
+    |> fn(el) { layout("Forgot Password Confirmation", el) }
     |> element.to_string
 
   let email =
@@ -103,7 +102,7 @@ pub fn send_invite(
 
   let body =
     [templates.invite(invite_link)]
-    |> curry2(layout)("Invitation")
+    |> fn(el) { layout("Invitation", el) }
     |> element.to_string
 
   let email =

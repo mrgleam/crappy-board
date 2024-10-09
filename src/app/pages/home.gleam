@@ -4,7 +4,6 @@ import app/models/item.{
   type Item, item_status_to_string, next_status, prev_status,
   string_to_item_status,
 }
-import gleam/function.{curry2}
 import gleam/list
 import gleam/result
 import gleam/string.{lowercase}
@@ -72,7 +71,7 @@ fn todos(board_id: String, items: List(Item)) -> Element(t) {
     html.ul(
       [],
       items
-        |> list.map(curry2(item)(board_id))
+        |> list.map(fn(it) { item(board_id, it) })
         |> list.prepend(todo_input(board_id)),
     ),
   ])
@@ -87,7 +86,7 @@ fn others(
     html.ul(
       [],
       items
-        |> list.map(curry2(item)(board_id)),
+        |> list.map(fn(it) { item(board_id, it) }),
     ),
   ])
 }

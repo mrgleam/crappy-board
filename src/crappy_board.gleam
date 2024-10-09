@@ -10,21 +10,22 @@ import gleam/pgo
 import mist
 import radish
 import wisp
+import wisp/wisp_mist
 
 pub fn main() {
   wisp.configure_logger()
 
-  dot_env.load()
-  let assert Ok(base_url) = env.get("BASE_URL")
-  let assert Ok(email_api_key) = env.get("EMAIL_API_KEY")
-  let assert Ok(secret_key_base) = env.get("SECRET_KEY_BASE")
-  let assert Ok(redis_host) = env.get("REDIS_HOST")
-  let assert Ok(pg_host) = env.get("PG_HOST")
-  let assert Ok(pg_port_string) = env.get("PG_PORT")
+  dot_env.load_default()
+  let assert Ok(base_url) = env.get_string("BASE_URL")
+  let assert Ok(email_api_key) = env.get_string("EMAIL_API_KEY")
+  let assert Ok(secret_key_base) = env.get_string("SECRET_KEY_BASE")
+  let assert Ok(redis_host) = env.get_string("REDIS_HOST")
+  let assert Ok(pg_host) = env.get_string("PG_HOST")
+  let assert Ok(pg_port_string) = env.get_string("PG_PORT")
   let assert Ok(pa_port) = int.parse(pg_port_string)
-  let assert Ok(pg_db) = env.get("PG_DB")
-  let assert Ok(pg_user) = env.get("PG_USER")
-  let assert Ok(pg_password) = env.get("PG_PASSWORD")
+  let assert Ok(pg_db) = env.get_string("PG_DB")
+  let assert Ok(pg_user) = env.get_string("PG_USER")
+  let assert Ok(pg_password) = env.get_string("PG_PASSWORD")
 
   // Start a database connection pool.
   // Typically you will want to create one pool for use in your program
@@ -58,7 +59,7 @@ pub fn main() {
   let handler = router.handle_request(_, ctx)
 
   let assert Ok(_) =
-    wisp.mist_handler(handler, secret_key_base)
+    wisp_mist.handler(handler, secret_key_base)
     |> mist.new
     |> mist.port(8000)
     |> mist.start_http

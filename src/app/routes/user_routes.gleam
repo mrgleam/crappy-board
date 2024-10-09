@@ -1,5 +1,6 @@
 import app/error
 import app/helpers/constant
+import app/helpers/curry
 import app/helpers/uuid
 import app/models/board.{create_board}
 import app/models/board_user.{
@@ -12,7 +13,6 @@ import app/models/user.{
 import app/pages
 import app/pages/layout.{layout}
 import app/web.{type Context, Context, bids_cookie, uid_cookie}
-import gleam/function
 import gleam/http.{Http}
 import gleam/http/cookie
 import gleam/http/response
@@ -351,14 +351,14 @@ pub fn post_invite(req: Request, ctx: Context) {
         list.key_find(form.values, "email"),
         email_validator,
       )
-      |> function.curry2(result.try)
+      |> curry.then()
 
     use user_id <-
       error.try_bad_request(
         result.map(get_user_by_email(user_email, ctx.db), fn(u) { u.id }),
         uuid.cast,
       )
-      |> function.curry2(result.try)
+      |> curry.then()
 
     use board_id <- result.try(
       error.map_bad_request(list.key_find(form.values, "board")),
