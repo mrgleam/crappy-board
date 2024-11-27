@@ -9,7 +9,11 @@ jobs:
   e2e_test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
     services:
       redis:
         image: redis
@@ -77,10 +81,42 @@ jobs:
       run: yarn playwright install --with-deps
     - name: Run Playwright tests
       working-directory: e2e
-      run: yarn start:ci
-    - uses: actions/upload-artifact@v4
-      if: always()
+      run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+    - name: Upload blob report to GitHub Actions Artifacts
+      if: ${{ !cancelled() }}
+      uses: actions/upload-artifact@v4
       with:
-        name: playwright-report
+        name: blob-report-${{ matrix.shardIndex }}
+        path: e2e/blob-report/
+        retention-days: 1
+  merge-reports:
+    if: ${{ !cancelled() }}
+    needs: [e2e_test]
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      working-directory: e2e
+      run: npm ci
+
+    - name: Download blob reports from GitHub Actions Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: e2e/all-blob-reports/
+        pattern: blob-report-*
+        merge-multiple: true
+
+    - name: Merge into HTML Report
+      working-directory: e2e
+      run: npx playwright merge-reports --reporter html ./all-blob-reports
+
+    - name: Upload HTML report
+      uses: actions/upload-artifact@v4
+      with:
+        name: html-report--attempt-${{ github.run_attempt }}
         path: e2e/playwright-report/
-        retention-days: 30
+        retention-days: 14
