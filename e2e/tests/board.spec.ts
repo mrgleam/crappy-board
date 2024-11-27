@@ -1,22 +1,39 @@
-import { expect, Locator } from "@playwright/test";
-import { test } from './my-test';
+import { test, expect, Locator } from './my-test';
 
-test.describe.configure({ mode: 'serial' });
-
-test.beforeEach(async ({ page, boardId }) => {
-  await page.goto(`/boards/${boardId}`);
+test.beforeEach(async ({ page, user02, user03, user04, boardId }, testInfo) => {
+  if (testInfo.title.includes("#user02")) {
+    await user02.page.goto(`/boards/${boardId.user02}`);
+  } else if (testInfo.title.includes("#user03")) {
+    await user03.page.goto(`/boards/${boardId.user03}`);
+  } else if (testInfo.title.includes("#user04")) {
+    await user04.page.goto(`/boards/${boardId.user04}`);
+  } else {
+    await page.goto(`/boards/${boardId.user01}`);
+  }
 });
 
-test.afterEach(async ({ page, boardId }) => {
-  await page.goto(`/boards/${boardId}`);
+test.afterEach(async ({ page, user02, user03, user04, boardId }, testInfo) => {
+  let currentPage = page;
+  if (testInfo.title.includes("#user02")) {
+    currentPage = user02.page;
+    await currentPage.goto(`/boards/${boardId.user02}`);
+  } else if (testInfo.title.includes("#user03")) {
+    currentPage = user03.page;
+    await currentPage.goto(`/boards/${boardId.user03}`);
+  } else if (testInfo.title.includes("#user04")) {
+    currentPage = user04.page;
+    await currentPage.goto(`/boards/${boardId.user04}`);
+  } else {
+    await page.goto(`/boards/${boardId.user01}`);
+  }
 
-  const todoItems = page.getByTestId("todo-items").locator("ul > li");
+  const todoItems = currentPage.getByTestId("todo-items").locator("ul > li");
   await deleteItems(todoItems, add1);
 
-  const doingItems = page.getByTestId("doing-items").locator("ul > li");
+  const doingItems = currentPage.getByTestId("doing-items").locator("ul > li");
   await deleteItems(doingItems, identity);
 
-  const doneItems = page.getByTestId("done-items").locator("ul > li");
+  const doneItems = currentPage.getByTestId("done-items").locator("ul > li");
   await deleteItems(doneItems, identity);
 });
 
@@ -78,19 +95,19 @@ test.describe("New Todo", () => {
     await expect(newTodo).toBeEmpty();
   });
 
-  test("should not allow me to add todo items when the board is limited to the number of items", async ({ page }) => {
+  test("should not allow me to add todo items when the board is limited to the number of items [#user02]", async ({ user02 }) => {
     // create a new todo locator
-    const newTodo = page.getByPlaceholder("What needs to be done?");
+    const newTodo = user02.page.getByPlaceholder("What needs to be done?");
 
     for (let i = 0; i < 20; i++) {
       await newTodo.fill(TODO_ITEMS[0]);
-      await page.getByTestId("create-todo").click();
+      await user02.page.getByTestId("create-todo").click();
     }
 
-    const responseSubmit = page.waitForResponse('**/items/create');
+    const responseSubmit = user02.page.waitForResponse('**/items/create');
     // Create item todo.
     await newTodo.fill(TODO_ITEMS[0]);
-    await page.getByTestId("create-todo").click();
+    await user02.page.getByTestId("create-todo").click();
 
     const response = await responseSubmit;
     expect(response.status()).toBe(400);
@@ -98,46 +115,46 @@ test.describe("New Todo", () => {
 });
 
 test.describe('Item', () => {
-  test('should allow me to move item from TODO to DOING', async ({ page }) => {
+  test('should allow me to move item from TODO to DOING [#user03]', async ({ user03 }) => {
     // create a new todo locator
-    const newTodo = page.getByPlaceholder('What needs to be done?');
+    const newTodo = user03.page.getByPlaceholder('What needs to be done?');
 
     // Create two items.
     for (const item of TODO_ITEMS.slice(0, 2)) {
       await newTodo.fill(item);
-      await page.getByTestId("create-todo").click();
+      await user03.page.getByTestId("create-todo").click();
     }
 
-    const firstTodoItem = page.getByTestId("todo-items").locator("ul > li").nth(1);
+    const firstTodoItem = user03.page.getByTestId("todo-items").locator("ul > li").nth(1);
     await firstTodoItem.hover();
     await firstTodoItem.getByTestId("toggle-next").click();
 
     // Make sure the list now has doing items.
-    await expect(page.getByTestId("doing-items")).toContainText([TODO_ITEMS[0]]);
+    await expect(user03.page.getByTestId("doing-items")).toContainText([TODO_ITEMS[0]]);
   })
 
-  test('should allow me to move item from DOING to DONE', async ({ page }) => {
+  test('should allow me to move item from DOING to DONE [#user04]', async ({ user04 }) => {
     // create a new todo locator
-    const newTodo = page.getByPlaceholder('What needs to be done?');
+    const newTodo = user04.page.getByPlaceholder('What needs to be done?');
 
     // Create two items.
     for (const item of TODO_ITEMS.slice(0, 2)) {
       await newTodo.fill(item);
-      await page.getByTestId("create-todo").click();
+      await user04.page.getByTestId("create-todo").click();
     }
 
-    const firstTodoItem = page.getByTestId("todo-items").locator("ul > li").nth(1);
+    const firstTodoItem = user04.page.getByTestId("todo-items").locator("ul > li").nth(1);
     await firstTodoItem.hover();
     await firstTodoItem.getByTestId("toggle-next").click();
 
     // Make sure the list now has doing items.
-    await expect(page.getByTestId("doing-items")).toContainText([TODO_ITEMS[0]]);
+    await expect(user04.page.getByTestId("doing-items")).toContainText([TODO_ITEMS[0]]);
 
-    const firstDoingItem = page.getByTestId("doing-items").locator("ul > li").nth(0);
+    const firstDoingItem = user04.page.getByTestId("doing-items").locator("ul > li").nth(0);
     await firstDoingItem.hover();
     await firstDoingItem.getByTestId("toggle-next").click();
 
     // Make sure the list now has done items.
-    await expect(page.getByTestId("done-items")).toContainText([TODO_ITEMS[0]]);
+    await expect(user04.page.getByTestId("done-items")).toContainText([TODO_ITEMS[0]]);
   })
 });

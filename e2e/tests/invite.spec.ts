@@ -1,8 +1,10 @@
 import { expect } from "@playwright/test";
 import { test } from './my-test';
 
+test.use({ storageState: "playwright/.auth/user01.json" });
+
 test.beforeEach(async ({ page, boardId }) => {
-  await page.goto(`/boards/${boardId}`);
+  await page.goto(`/boards/${boardId.user01}`);
 });
 
 test.describe('Invite', () => {
